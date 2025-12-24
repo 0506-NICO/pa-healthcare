@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Appointments - P&A Institute</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary:#10b981; --primary-dark:#059669; --accent:#3dd9a4; --bg:#0f172a; --bg-card:#1e293b; --bg-input:#334155; --text:#f1f5f9; --text-muted:#64748b; --border:rgba(255,255,255,0.1); --success:#10b981; --warning:#f59e0b; --danger:#ef4444; --info:#3b82f6; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+        .navbar { background:var(--bg-card); padding:15px 0; border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
+        .nav-container { max-width:1200px; margin:0 auto; padding:0 20px; display:flex; align-items:center; justify-content:space-between; }
+        .logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text); }
+        .logo-icon { width:40px; height:40px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+        .logo-text { font-weight:700; font-size:1.1rem; }
+        .nav-links { display:flex; align-items:center; gap:20px; }
+        .nav-link { color:var(--text-muted); text-decoration:none; font-size:0.9rem; transition:color 0.2s; }
+        .nav-link:hover { color:var(--primary); }
+        .container { max-width:1000px; margin:0 auto; padding:40px 20px; }
+        .page-header { margin-bottom:30px; }
+        .page-title { font-size:1.8rem; font-weight:700; margin-bottom:10px; }
+        .page-subtitle { color:var(--text-muted); }
+        .tabs { display:flex; gap:10px; margin-bottom:30px; flex-wrap:wrap; }
+        .tab { padding:10px 20px; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; color:var(--text-muted); cursor:pointer; transition:all 0.2s; font-size:0.9rem; }
+        .tab:hover,.tab.active { background:var(--primary); color:white; border-color:var(--primary); }
+        .appointments-list { display:flex; flex-direction:column; gap:15px; }
+        .appointment-card { background:var(--bg-card); border-radius:16px; padding:25px; border:1px solid var(--border); }
+        .appointment-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; gap:15px; }
+        .appointment-service { font-size:1.2rem; font-weight:600; }
+        .appointment-id { font-size:0.8rem; color:var(--text-muted); margin-top:5px; }
+        .status-badge { padding:6px 14px; border-radius:20px; font-size:0.8rem; font-weight:500; }
+        .status-badge.pending { background:rgba(245,158,11,0.15); color:var(--warning); }
+        .status-badge.confirmed { background:rgba(16,185,129,0.15); color:var(--success); }
+        .status-badge.completed { background:rgba(59,130,246,0.15); color:var(--info); }
+        .status-badge.cancelled { background:rgba(239,68,68,0.15); color:var(--danger); }
+        .appointment-details { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:20px; margin-bottom:20px; }
+        .detail-item { display:flex; align-items:center; gap:10px; }
+        .detail-icon { width:36px; height:36px; background:var(--bg-input); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--primary); }
+        .detail-label { font-size:0.75rem; color:var(--text-muted); }
+        .detail-value { font-weight:500; }
+        .appointment-actions { display:flex; gap:10px; flex-wrap:wrap; padding-top:20px; border-top:1px solid var(--border); }
+        .btn { padding:10px 20px; border-radius:8px; font-size:0.9rem; font-weight:500; cursor:pointer; transition:all 0.2s; border:none; display:inline-flex; align-items:center; gap:8px; }
+        .btn-primary { background:var(--primary); color:white; }
+        .btn-primary:hover { background:var(--primary-dark); }
+        .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
+        .btn-outline:hover { border-color:var(--primary); color:var(--primary); }
+        .btn-danger { background:rgba(239,68,68,0.15); color:var(--danger); }
+        .btn-danger:hover { background:var(--danger); color:white; }
+        .empty-state { text-align:center; padding:60px 20px; }
+        .empty-icon { font-size:4rem; color:var(--text-muted); margin-bottom:20px; opacity:0.5; }
+        .empty-title { font-size:1.3rem; font-weight:600; margin-bottom:10px; }
+        .empty-text { color:var(--text-muted); margin-bottom:25px; }
+        .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; padding:20px; }
+        .modal-overlay.show { display:flex; }
+        .modal { background:var(--bg-card); border-radius:20px; width:100%; max-width:450px; border:1px solid var(--border); }
+        .modal-header { padding:25px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+        .modal-title { font-size:1.2rem; font-weight:600; }
+        .modal-close { width:36px; height:36px; background:var(--bg-input); border:none; border-radius:50%; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+        .modal-close:hover { background:var(--danger); color:white; }
+        .modal-body { padding:25px; }
+        .modal-footer { padding:20px 25px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; }
+        .form-group { margin-bottom:20px; }
+        .form-label { display:block; font-size:0.875rem; color:var(--text-muted); margin-bottom:8px; }
+        .form-input,.form-select { width:100%; padding:12px 15px; background:var(--bg-input); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:0.95rem; }
+        .form-input:focus,.form-select:focus { outline:none; border-color:var(--primary); }
+        .notification { position:fixed; top:20px; right:20px; background:var(--bg-card); border-radius:12px; padding:16px 20px; display:flex; align-items:center; gap:12px; box-shadow:0 10px 40px rgba(0,0,0,0.3); border-left:4px solid var(--success); z-index:10000; transform:translateX(120%); transition:transform 0.3s; }
+        .notification.show { transform:translateX(0); }
+        .notification.error { border-left-color:var(--danger); }
+        .loading { text-align:center; padding:40px; color:var(--text-muted); }
+        .spinner { width:40px; height:40px; border:3px solid var(--bg-input); border-top-color:var(--primary); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 15px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        @media (max-width:768px) { .appointment-details { grid-template-columns:1fr 1fr; } .nav-links { display:none; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo"><div class="logo-icon">🏥</div><span class="logo-text">P&A Institute</span></a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="index.html#services" class="nav-link">Services</a>
+                <a href="index.html#booking" class="nav-link">Book Appointment</a>
+                <a href="my-profile.html" class="nav-link">My Profile</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">My Appointments</h1>
+            <p class="page-subtitle">View and manage your healthcare appointments</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-filter="all">All</div>
+            <div class="tab" data-filter="pending">Pending</div>
+            <div class="tab" data-filter="confirmed">Confirmed</div>
+            <div class="tab" data-filter="completed">Completed</div>
+            <div class="tab" data-filter="cancelled">Cancelled</div>
+        </div>
+
+        <div class="appointments-list" id="appointmentsList">
+            <div class="loading"><div class="spinner"></div>Loading appointments...</div>
+        </div>
+    </div>
+
+    <!-- Reschedule Modal -->
+    <div class="modal-overlay" id="rescheduleModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Reschedule Appointment</h3>
+                <button class="modal-close" onclick="closeModal('rescheduleModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">New Date</label>
+                    <input type="date" class="form-input" id="newDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Time</label>
+                    <select class="form-select" id="newTime">
+                        <option value="09:00 AM">09:00 AM</option>
+                        <option value="10:00 AM">10:00 AM</option>
+                        <option value="11:00 AM">11:00 AM</option>
+                        <option value="12:00 PM">12:00 PM</option>
+                        <option value="02:00 PM">02:00 PM</option>
+                        <option value="03:00 PM">03:00 PM</option>
+                        <option value="04:00 PM">04:00 PM</option>
+                        <option value="05:00 PM">05:00 PM</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('rescheduleModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmReschedule()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Modal -->
+    <div class="modal-overlay" id="cancelModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Cancel Appointment</h3>
+                <button class="modal-close" onclick="closeModal('cancelModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:20px;">Are you sure you want to cancel this appointment?</p>
+                <p style="color:var(--text-muted);font-size:0.9rem;"><i class="fas fa-info-circle"></i> Cancellations made less than 24 hours before the appointment may be subject to a fee.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('cancelModal')">Keep Appointment</button>
+                <button class="btn btn-danger" onclick="confirmCancel()">Yes, Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"><i class="fas fa-check-circle" id="notifIcon"></i><span id="notifText">Success</span></div>
+
+    <script>
+        const API_URL = 'http://localhost:5002/api';
+        let appointments = [];
+        let currentFilter = 'all';
+        let selectedAppointmentId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadAppointments();
+            setupTabs();
+        });
+
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (!user || !user.loggedIn) { 
+                alert('Please login first');
+                window.location.href = 'index.html'; 
+                return; 
+            }
+        }
+
+        async function loadAppointments() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const container = document.getElementById('appointmentsList');
+            
+            try {
+                const response = await fetch(`${API_URL}/appointments?email=${encodeURIComponent(user.email)}`);
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    appointments = data.data;
+                } else {
+                    // Try admin endpoint as fallback and filter by email
+                    const adminResponse = await fetch(`${API_URL}/admin/appointments`);
+                    const adminData = await adminResponse.json();
+                    if (adminData.success && adminData.data) {
+                        appointments = adminData.data.filter(apt => apt.email === user.email);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading appointments:', error);
+                appointments = [];
+            }
+            
+            renderAppointments();
+        }
+
+        function renderAppointments() {
+            const container = document.getElementById('appointmentsList');
+            let filtered = currentFilter === 'all' ? appointments : appointments.filter(a => a.status === currentFilter);
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-calendar-times"></i></div>
+                        <h3 class="empty-title">No Appointments Found</h3>
+                        <p class="empty-text">${currentFilter === 'all' ? "You haven't booked any appointments yet." : `No ${currentFilter} appointments.`}</p>
+                        <a href="index.html#booking" class="btn btn-primary"><i class="fas fa-plus"></i> Book Appointment</a>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(apt => {
+                const name = apt.full_name || apt.fullName || 'Patient';
+                const canReschedule = apt.status === 'pending' || apt.status === 'confirmed';
+                const canCancel = apt.status === 'pending' || apt.status === 'confirmed';
+                
+                return `
+                <div class="appointment-card">
+                    <div class="appointment-header">
+                        <div>
+                            <div class="appointment-service">${apt.service}</div>
+                            <div class="appointment-id">ID: ${apt.id}</div>
+                        </div>
+                        <span class="status-badge ${apt.status}">${apt.status}</span>
+                    </div>
+                    <div class="appointment-details">
+                        <div class="detail-item">
+                            <div class="detail-icon"><i class="fas fa-calendar"></i></div>
+                            <div><div class="detail-label">Date</div><div class="detail-value">${formatDate(apt.date)}</div></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-icon"><i class="fas fa-clock"></i></div>
+                            <div><div class="detail-label">Time</div><div class="detail-value">${apt.time}</div></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-icon"><i class="fas fa-naira-sign"></i></div>
+                            <div><div class="detail-label">Amount</div><div class="detail-value">${formatCurrency(getServicePrice(apt.service))}</div></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-icon"><i class="fas fa-hospital"></i></div>
+                            <div><div class="detail-label">Location</div><div class="detail-value">Main Clinic</div></div>
+                        </div>
+                    </div>
+                    <div class="appointment-actions">
+                        ${canReschedule ? `<button class="btn btn-outline" onclick="openReschedule('${apt.id}')"><i class="fas fa-calendar-alt"></i> Reschedule</button>` : ''}
+                        ${canCancel ? `<button class="btn btn-danger" onclick="openCancel('${apt.id}')"><i class="fas fa-times"></i> Cancel</button>` : ''}
+                        ${apt.status === 'completed' ? `<button class="btn btn-primary" onclick="bookAgain('${apt.service}')"><i class="fas fa-redo"></i> Book Again</button>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentFilter = tab.dataset.filter;
+                    renderAppointments();
+                });
+            });
+        }
+
+        function openReschedule(id) {
+            selectedAppointmentId = id;
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('newDate').min = tomorrow.toISOString().split('T')[0];
+            document.getElementById('rescheduleModal').classList.add('show');
+        }
+
+        function openCancel(id) {
+            selectedAppointmentId = id;
+            document.getElementById('cancelModal').classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+            selectedAppointmentId = null;
+        }
+
+        async function confirmReschedule() {
+            const newDate = document.getElementById('newDate').value;
+            const newTime = document.getElementById('newTime').value;
+            
+            if (!newDate) { showNotification('Please select a date', 'error'); return; }
+            
+            try {
+                const response = await fetch(`${API_URL}/appointments/${selectedAppointmentId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date: newDate, time: newTime })
+                });
+                
+                const apt = appointments.find(a => a.id === selectedAppointmentId);
+                if (apt) { apt.date = newDate; apt.time = newTime; }
+                
+                renderAppointments();
+                closeModal('rescheduleModal');
+                showNotification('Appointment rescheduled successfully!');
+            } catch (error) {
+                showNotification('Failed to reschedule', 'error');
+            }
+        }
+
+        async function confirmCancel() {
+            try {
+                const response = await fetch(`${API_URL}/appointments/${selectedAppointmentId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'cancelled' })
+                });
+                
+                const apt = appointments.find(a => a.id === selectedAppointmentId);
+                if (apt) apt.status = 'cancelled';
+                
+                renderAppointments();
+                closeModal('cancelModal');
+                showNotification('Appointment cancelled');
+            } catch (error) {
+                showNotification('Failed to cancel', 'error');
+            }
+        }
+
+        function bookAgain(service) {
+            localStorage.setItem('selectedService', service);
+            window.location.href = 'index.html#booking';
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            return new Date(dateStr).toLocaleDateString('en-NG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function formatCurrency(amount) { return '₦' + (amount || 0).toLocaleString(); }
+
+        function getServicePrice(service) {
+            const prices = { 'General Consultation': 5000, 'Laboratory Tests': 8000, 'Specialized Care': 15000, 'Emergency Care': 25000, 'Mental Health': 10000, 'Eye Care': 12000 };
+            return prices[service] || 5000;
+        }
+
+        function showNotification(msg, type = 'success') {
+            const n = document.getElementById('notification');
+            const icon = document.getElementById('notifIcon');
+            document.getElementById('notifText').textContent = msg;
+            icon.className = 'fas ' + (type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle');
+            n.style.borderLeftColor = type === 'error' ? 'var(--danger)' : 'var(--success)';
+            n.classList.add('show');
+            setTimeout(() => n.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

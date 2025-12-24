@@ -1,0 +1,2093 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P&A Institute of Integrative Medicine</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ============================================
+           COMPLETE CSS - ALL IN ONE
+           ============================================ */
+
+        :root {
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --primary-light: #14b8a6;
+            --secondary: #064e3b;
+            --accent: #10b981;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--white);
+            color: var(--gray-700);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(13, 148, 136, 0.4);
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-lg {
+            padding: 16px 32px;
+            font-size: 1rem;
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 15px 0;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .navbar.scrolled {
+            background: white;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .navbar-logo {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .navbar-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--gray-900);
+        }
+
+        .navbar-title span {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--gray-500);
+        }
+
+        .navbar-nav {
+            display: flex;
+            list-style: none;
+            gap: 35px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--gray-600);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* User Menu */
+        .nav-user-menu {
+            position: relative;
+            display: none;
+        }
+
+        .user-avatar-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: 2px solid white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 280px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
+            overflow: hidden;
+        }
+
+        .user-dropdown.active {
+            display: block;
+        }
+
+        .user-dropdown-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-dropdown-avatar {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .user-dropdown-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .user-dropdown-email {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .user-dropdown-menu {
+            padding: 8px;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--gray-700);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 2px;
+        }
+
+        .dropdown-item:hover {
+            background: var(--gray-100);
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            color: var(--gray-500);
+        }
+
+        .dropdown-item.logout {
+            color: var(--danger);
+        }
+
+        .dropdown-item.logout:hover {
+            background: #fef2f2;
+        }
+
+        .dropdown-item.logout i {
+            color: var(--danger);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--gray-200);
+            margin: 8px 0;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            padding: 120px 0 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 80%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 50px;
+            color: white;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+
+        .hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1.1;
+            margin-bottom: 25px;
+        }
+
+        .hero-title span {
+            color: #5eead4;
+        }
+
+        .hero-description {
+            font-size: 1.15rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 35px;
+            max-width: 500px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 50px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+        }
+
+        .hero-stat-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .hero-stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .hero-visual {
+            position: relative;
+        }
+
+        .hero-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.15);
+        }
+
+        .hero-card-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+
+        .hero-card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 10px;
+        }
+
+        .hero-card-text {
+            color: var(--gray-500);
+            margin-bottom: 25px;
+        }
+
+        .floating-card {
+            position: absolute;
+            background: white;
+            border-radius: 16px;
+            padding: 15px 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .floating-card-1 {
+            top: 20px;
+            left: -40px;
+        }
+
+        .floating-card-2 {
+            bottom: 40px;
+            right: -30px;
+        }
+
+        .floating-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .floating-card-icon.success {
+            background: #d1fae5;
+            color: var(--success);
+        }
+
+        .floating-card-icon.info {
+            background: #dbeafe;
+            color: var(--info);
+        }
+
+        .floating-card-text {
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 0.9rem;
+        }
+
+        .floating-card-subtext {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+
+        /* Sections */
+        .section {
+            padding: 100px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 60px;
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(13, 148, 136, 0.1);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 15px;
+        }
+
+        .section-description {
+            color: var(--gray-500);
+            font-size: 1.1rem;
+        }
+
+        /* Services */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(13, 148, 136, 0.1), rgba(13, 148, 136, 0.05));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .service-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 10px;
+        }
+
+        .service-description {
+            color: var(--gray-500);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .service-price {
+            margin-bottom: 20px;
+        }
+
+        .service-price-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .service-price-label {
+            color: var(--gray-400);
+            font-size: 0.85rem;
+        }
+
+        .service-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .service-features li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .service-features li i {
+            color: var(--success);
+        }
+
+        /* Appointment */
+        .appointment-section {
+            background: linear-gradient(135deg, var(--gray-50), var(--gray-100));
+        }
+
+        .appointment-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .appointment-info-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 20px;
+        }
+
+        .appointment-info-text {
+            color: var(--gray-600);
+            margin-bottom: 35px;
+        }
+
+        .appointment-feature {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .appointment-feature-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .appointment-feature-title {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .appointment-feature-text {
+            color: var(--gray-500);
+            font-size: 0.9rem;
+        }
+
+        .appointment-form-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .form-subtitle {
+            color: var(--gray-500);
+            font-size: 0.95rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: var(--gray-900);
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 16px;
+            font-size: 1rem;
+        }
+
+        /* Contact */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .contact-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            text-align: center;
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .contact-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(13, 148, 136, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: var(--primary);
+            margin: 0 auto 20px;
+        }
+
+        .contact-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 10px;
+        }
+
+        .contact-text {
+            color: var(--gray-500);
+            font-size: 0.95rem;
+        }
+
+        .contact-text a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Testimonials */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .testimonial-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .testimonial-stars {
+            color: #fbbf24;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-text {
+            color: var(--gray-600);
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .testimonial-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .testimonial-name {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .testimonial-role {
+            color: var(--gray-500);
+            font-size: 0.85rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--gray-900);
+            color: var(--gray-400);
+            padding: 80px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 50px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo-icon {
+            font-size: 30px;
+        }
+
+        .footer-logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .footer-description {
+            margin-bottom: 25px;
+            line-height: 1.7;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 12px;
+        }
+
+        .footer-social a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .footer-social a:hover {
+            background: var(--primary);
+        }
+
+        .footer-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--gray-400);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-legal {
+            display: flex;
+            gap: 25px;
+        }
+
+        .footer-legal a {
+            color: var(--gray-500);
+            text-decoration: none;
+        }
+
+        /* Modal */
+        #authModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #authModal.active {
+            display: flex !important;
+        }
+
+        #authModal .modal {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        #authModal .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        #authModal .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin: 0;
+        }
+
+        #authModal .modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--gray-100);
+            color: var(--gray-500);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+
+        #authModal .modal-close:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        #authModal .modal-body {
+            padding: 30px;
+        }
+
+        /* Notification */
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            max-width: 380px;
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            z-index: 100000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            border-left: 4px solid var(--success);
+        }
+
+        .notification-toast.show {
+            transform: translateX(0);
+        }
+
+        .notification-toast.success {
+            border-left-color: var(--success);
+        }
+
+        .notification-toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .notification-toast.warning {
+            border-left-color: var(--warning);
+        }
+
+        .notification-toast.info {
+            border-left-color: var(--info);
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notification-toast.success .notification-icon {
+            background: #d1fae5;
+            color: var(--success);
+        }
+
+        .notification-toast.error .notification-icon {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .notification-toast.warning .notification-icon {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        .notification-toast.info .notification-icon {
+            background: #dbeafe;
+            color: var(--info);
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 2px;
+        }
+
+        .notification-text {
+            font-size: 0.9rem;
+            color: var(--gray-500);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+
+            .hero-content,
+            .appointment-wrapper {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-description,
+            .hero-buttons,
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .hero-visual {
+                order: -1;
+            }
+
+            .floating-card {
+                display: none;
+            }
+
+            .services-grid,
+            .testimonials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .contact-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar-nav {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 5px;
+            }
+
+            .mobile-menu-btn span {
+                width: 25px;
+                height: 3px;
+                background: var(--gray-700);
+                border-radius: 2px;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .services-grid,
+            .testimonials-grid,
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-social {
+                justify-content: center;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <a href="#" class="navbar-brand">
+                <div class="navbar-logo">🏥</div>
+                <div class="navbar-title">P&A Institute<span>Integrative Medicine</span></div>
+            </a>
+
+            <ul class="navbar-nav">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#services" class="nav-link">Services</a></li>
+                <li><a href="#appointments" class="nav-link">Book Appointment</a></li>
+                <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+
+            <div class="navbar-actions">
+                <button class="btn btn-primary" id="loginBtn" onclick="showLogin()">
+                    <i class="fas fa-user"></i> Login
+                </button>
+
+                <div class="nav-user-menu" id="navUserMenu">
+                   <button class="user-avatar-btn" onclick="toggleUserDropdown(event)" id="userAvatarBtn">
+                        <span id="userInitials">U</span>
+                    </button>
+
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="user-dropdown-header">
+                            <div class="user-dropdown-avatar" id="userDropdownAvatar">U</div>
+                            <div>
+                                <div class="user-dropdown-name" id="userDropdownName">User</div>
+                                <div class="user-dropdown-email" id="userDropdownEmail">user@email.com</div>
+                            </div>
+                        </div>
+                        <div class="user-dropdown-menu">
+                            <a href="my-profile.html" class="dropdown-item"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="my-appointments.html" class="dropdown-item"><i class="fas fa-calendar-check"></i>
+                                My Appointments</a>
+                            <a href="payment-history.html" class="dropdown-item"><i class="fas fa-credit-card"></i>
+                                Payment History</a>
+                            <a href="settings.html" class="dropdown-item"><i class="fas fa-cog"></i> Settings</a>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item logout" onclick="handleLogout()"><i
+                                    class="fas fa-sign-out-alt"></i> Logout</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="mobile-menu-btn" id="mobileMenuBtn"><span></span><span></span><span></span></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="hero-badge"><i class="fas fa-shield-heart"></i> Trusted Healthcare Partner</div>
+                    <h1 class="hero-title">Your Health is Our <span>Top Priority</span></h1>
+                    <p class="hero-description">Experience world-class medical care with our team of expert doctors.
+                        Book appointments online, access quality healthcare services, available 24/7.</p>
+                    <div class="hero-buttons">
+                        <a href="#appointments" class="btn btn-white btn-lg"><i class="fas fa-calendar-plus"></i> Book
+                            Appointment</a>
+                        <a href="#services" class="btn btn-lg"
+                            style="background: transparent; border: 2px solid rgba(255,255,255,0.3); color: white;"><i
+                                class="fas fa-stethoscope"></i> Our Services</a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <div class="hero-stat-value">15k+</div>
+                            <div class="hero-stat-label">Happy Patients</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-value">50+</div>
+                            <div class="hero-stat-label">Expert Doctors</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-value">24/7</div>
+                            <div class="hero-stat-label">Available</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="hero-card">
+                        <div class="hero-card-icon">🩺</div>
+                        <h3 class="hero-card-title">Quick Health Check</h3>
+                        <p class="hero-card-text">Get comprehensive health assessments from our experienced medical
+                            professionals.</p>
+                        <a href="#appointments" class="btn btn-primary">Schedule Now <i
+                                class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="floating-card floating-card-1">
+                        <div class="floating-card-icon success"><i class="fas fa-check"></i></div>
+                        <div>
+                            <div class="floating-card-text">Appointment Confirmed</div>
+                            <div class="floating-card-subtext">Dr. Sarah • 10:00 AM</div>
+                        </div>
+                    </div>
+                    <div class="floating-card floating-card-2">
+                        <div class="floating-card-icon info"><i class="fas fa-user-md"></i></div>
+                        <div>
+                            <div class="floating-card-text">50+ Specialists</div>
+                            <div class="floating-card-subtext">Available today</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services section" id="services">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge"><i class="fas fa-star"></i> Our Services</div>
+                <h2 class="section-title">Comprehensive Healthcare Solutions</h2>
+                <p class="section-description">We offer a wide range of medical services designed to meet all your
+                    healthcare needs.</p>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-user-md"></i></div>
+                    <h3 class="service-title">General Consultation</h3>
+                    <p class="service-description">Comprehensive medical consultations with experienced physicians.</p>
+                    <div class="service-price"><span class="service-price-value">₦5,000</span><span
+                            class="service-price-label"> per visit</span></div>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check-circle"></i> Full health assessment</li>
+                        <li><i class="fas fa-check-circle"></i> Medical history review</li>
+                        <li><i class="fas fa-check-circle"></i> Treatment recommendations</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="selectService('General Consultation', 5000)">Book
+                        Now</button>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-flask"></i></div>
+                    <h3 class="service-title">Laboratory Tests</h3>
+                    <p class="service-description">State-of-the-art laboratory testing with accurate results.</p>
+                    <div class="service-price"><span class="service-price-value">₦8,000</span><span
+                            class="service-price-label"> starting</span></div>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check-circle"></i> Blood work & analysis</li>
+                        <li><i class="fas fa-check-circle"></i> Urine & stool tests</li>
+                        <li><i class="fas fa-check-circle"></i> Digital results delivery</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="selectService('Laboratory Tests', 8000)">Book Now</button>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-heartbeat"></i></div>
+                    <h3 class="service-title">Specialized Care</h3>
+                    <p class="service-description">Access to specialist doctors for specific health conditions.</p>
+                    <div class="service-price"><span class="service-price-value">₦15,000</span><span
+                            class="service-price-label"> per session</span></div>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check-circle"></i> Expert specialists</li>
+                        <li><i class="fas fa-check-circle"></i> Personalized treatment</li>
+                        <li><i class="fas fa-check-circle"></i> Follow-up care</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="selectService('Specialized Care', 15000)">Book Now</button>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-ambulance"></i></div>
+                    <h3 class="service-title">Emergency Care</h3>
+                    <p class="service-description">24/7 emergency medical services with rapid response.</p>
+                    <div class="service-price"><span class="service-price-value">₦25,000</span><span
+                            class="service-price-label"> emergency</span></div>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check-circle"></i> 24/7 availability</li>
+                        <li><i class="fas fa-check-circle"></i> Rapid response</li>
+                        <li><i class="fas fa-check-circle"></i> Critical care support</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="selectService('Emergency Care', 25000)">Book Now</button>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-brain"></i></div>
+                    <h3 class="service-title">Mental Health</h3>
+                    <p class="service-description">Professional mental health services and counseling.</p>
+                    <div class="service-price"><span class="service-price-value">₦10,000</span><span
+                            class="service-price-label"> per session</span></div>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check-circle"></i> Confidential sessions</li>
+                        <li><i class="fas fa-check-circle"></i> Therapy & counseling</li>
+                        <li><i class="fas fa-check-circle"></i> Stress management</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="selectService('Mental Health', 10000)">Book Now</button>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-eye"></i></div>
+                    <h3 class="service-title">Eye Care</h3>
+                    <p class="service-description">Complete eye examinations and vision care services.</p>
+                    <div class="service-price"><span class="service-price-value">₦12,000</span><span
+                            class="service-price-label"> per exam</span></div>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check-circle"></i> Vision testing</li>
+                        <li><i class="fas fa-check-circle"></i> Eye disease screening</li>
+                        <li><i class="fas fa-check-circle"></i> Prescription services</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="selectService('Eye Care', 12000)">Book Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Appointment Section -->
+    <section class="appointment-section section" id="appointments">
+        <div class="container">
+            <div class="appointment-wrapper">
+                <div class="appointment-info">
+                    <div class="section-badge"><i class="fas fa-calendar-check"></i> Easy Booking</div>
+                    <h2 class="appointment-info-title">Book Your Appointment in Minutes</h2>
+                    <p class="appointment-info-text">Schedule your visit with our healthcare professionals quickly and
+                        easily.</p>
+
+                    <div class="appointment-features">
+                        <div class="appointment-feature">
+                            <div class="appointment-feature-icon"><i class="fas fa-clock"></i></div>
+                            <div>
+                                <h4 class="appointment-feature-title">Flexible Scheduling</h4>
+                                <p class="appointment-feature-text">Book at times that work for you</p>
+                            </div>
+                        </div>
+                        <div class="appointment-feature">
+                            <div class="appointment-feature-icon"><i class="fas fa-bell"></i></div>
+                            <div>
+                                <h4 class="appointment-feature-title">Instant Confirmation</h4>
+                                <p class="appointment-feature-text">Receive email confirmation immediately</p>
+                            </div>
+                        </div>
+                        <div class="appointment-feature">
+                            <div class="appointment-feature-icon"><i class="fas fa-shield-alt"></i></div>
+                            <div>
+                                <h4 class="appointment-feature-title">Secure Payments</h4>
+                                <p class="appointment-feature-text">Pay safely with Paystack</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="appointment-form-card">
+                    <div class="form-header">
+                        <h3 class="form-title">Schedule Your Visit</h3>
+                        <p class="form-subtitle">Fill in your details below</p>
+                    </div>
+
+                    <form id="appointmentForm" onsubmit="handleAppointmentSubmit(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" class="form-input" id="fullName" name="fullName"
+                                    placeholder="John Doe" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-input" id="email" name="email"
+                                    placeholder="john@example.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Phone *</label>
+                                <input type="tel" class="form-input" id="phone" name="phone"
+                                    placeholder="+234 XXX XXX XXXX" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Service *</label>
+                                <select class="form-select" id="service" name="service" required
+                                    onchange="updatePrice()">
+                                    <option value="">Choose a service</option>
+                                    <option value="General Consultation" data-price="5000">General Consultation - ₦5,000
+                                    </option>
+                                    <option value="Laboratory Tests" data-price="8000">Laboratory Tests - ₦8,000
+                                    </option>
+                                    <option value="Specialized Care" data-price="15000">Specialized Care - ₦15,000
+                                    </option>
+                                    <option value="Emergency Care" data-price="25000">Emergency Care - ₦25,000</option>
+                                    <option value="Mental Health" data-price="10000">Mental Health - ₦10,000</option>
+                                    <option value="Eye Care" data-price="12000">Eye Care - ₦12,000</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Date *</label>
+                                <input type="date" class="form-input" id="date" name="date" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Time *</label>
+                                <select class="form-select" id="time" name="time" required>
+                                    <option value="">Select time</option>
+                                    <option value="09:00">09:00 AM</option>
+                                    <option value="10:00">10:00 AM</option>
+                                    <option value="11:00">11:00 AM</option>
+                                    <option value="12:00">12:00 PM</option>
+                                    <option value="14:00">02:00 PM</option>
+                                    <option value="15:00">03:00 PM</option>
+                                    <option value="16:00">04:00 PM</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Additional Notes</label>
+                            <textarea class="form-input" id="message" name="message" rows="3"
+                                placeholder="Any concerns..."></textarea>
+                        </div>
+
+                        <div
+                            style="background: var(--gray-50); padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 600; color: var(--gray-700);">Total Amount:</span>
+                            <span id="totalAmount"
+                                style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">₦0</span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary form-submit" id="submitBtn">
+                            <i class="fas fa-credit-card"></i> Pay & Book Appointment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials section" id="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge"><i class="fas fa-heart"></i> Testimonials</div>
+                <h2 class="section-title">What Our Patients Say</h2>
+                <p class="section-description">Real experiences from our valued patients.</p>
+            </div>
+
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p class="testimonial-text">"The care I received was exceptional. The doctors were thorough and
+                        compassionate. Highly recommend!"</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">AO</div>
+                        <div>
+                            <div class="testimonial-name">Adebayo Okonkwo</div>
+                            <div class="testimonial-role">Business Executive</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p class="testimonial-text">"Booking online was so convenient! The staff was friendly and
+                        professional. Great experience overall."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">FI</div>
+                        <div>
+                            <div class="testimonial-name">Fatima Ibrahim</div>
+                            <div class="testimonial-role">Teacher</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="testimonial-text">"Quality care has always been consistent. Laboratory results are
+                        accurate and delivered promptly."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">CE</div>
+                        <div>
+                            <div class="testimonial-name">Chukwuemeka Eze</div>
+                            <div class="testimonial-role">Engineer</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="contact section" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge"><i class="fas fa-phone"></i> Get In Touch</div>
+                <h2 class="section-title">Contact Us</h2>
+                <p class="section-description">We're here to help. Reach out anytime.</p>
+            </div>
+
+            <div class="contact-grid">
+                <div class="contact-card">
+                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <h3 class="contact-title">Visit Us</h3>
+                    <p class="contact-text">No 8 Animashaun Cl,Alaguntan BusStop,<br>Alimosho LGA, Lagos</p>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                    <h3 class="contact-title">Call Us</h3>
+                    <p class="contact-text"><a href="tel:+2341234567890">+234 905 506 638 1</a></p>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                    <h3 class="contact-title">Email Us</h3>
+                    <p class="contact-text"><a href="mailto:miniquehairs@gmail.com">miniquehairs@gmail.com</a></p>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-icon"><i class="fas fa-clock"></i></div>
+                    <h3 class="contact-title">Hours</h3>
+                    <p class="contact-text">Mon-Fri: 8AM - 8PM<br>Sat-Sun: 9AM - 5PM</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <div class="footer-logo-icon">🏥</div>
+                        <div class="footer-logo-text">P&A Institute</div>
+                    </div>
+                    <p class="footer-description">Providing exceptional healthcare with compassion and excellence.</p>
+                    <div class="footer-social">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-title">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#appointments">Book Appointment</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-title">Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">General Consultation</a></li>
+                        <li><a href="#">Laboratory Tests</a></li>
+                        <li><a href="#">Specialized Care</a></li>
+                        <li><a href="#">Emergency Care</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-title">Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="help-center.html">Help Center</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-of-service.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 P&A Institute. All rights reserved.</p>
+                <div class="footer-legal"><a href="#">Privacy</a><a href="#">Terms</a></div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auth Modal -->
+    <div id="authModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="authModalTitle">Login</h3>
+                <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="authModalBody">
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password"
+                            required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;"><i
+                            class="fas fa-sign-in-alt"></i> Login</button>
+                    <p style="text-align: center; margin-top: 20px; color: var(--gray-500);">Don't have an account? <a
+                            href="#" onclick="showRegisterForm()" style="color: var(--primary); font-weight: 500;">Sign
+                            up</a></p>
+                </form>
+
+                <form id="registerForm" style="display: none;" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-input" id="registerName" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" id="registerEmail" placeholder="Enter your email"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="registerPassword" placeholder="Create password"
+                            required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-user-plus"></i>
+                        Create Account</button>
+                    <p style="text-align: center; margin-top: 20px; color: var(--gray-500);">Already have an account? <a
+                            href="#" onclick="showLoginForm()"
+                            style="color: var(--primary); font-weight: 500;">Login</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification-toast" id="notification">
+        <div class="notification-icon"><i class="fas fa-check"></i></div>
+        <div>
+            <div class="notification-title" id="notificationTitle">Success!</div>
+            <div class="notification-text" id="notificationText"></div>
+        </div>
+    </div>
+
+    <!-- Paystack Script -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+
+    <script>
+        // ============================================
+        // CONFIGURATION - UPDATE THESE!
+        // ============================================
+        const API_URL = 'http://localhost:5002/api';  // Your backend URL
+        const PAYSTACK_PUBLIC_KEY = 'pk_test_f84e02cb1d28923c5f283e04c6a0e9dfc3ab275c'; // Your Paystack public key
+
+        // ============================================
+        // STATE
+        // ============================================
+        let currentUser = null;
+        let selectedPrice = 0;
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('🏥 P&A Institute - Initializing...');
+            checkLoginStatus();
+            setupNavbar();
+            setupDropdownClose();
+            setMinDate();
+            console.log('✅ Healthcare App Ready!');
+        });
+
+        function setMinDate() {
+            const dateInput = document.getElementById('date');
+            if (dateInput) dateInput.min = new Date().toISOString().split('T')[0];
+        }
+
+        function setupNavbar() {
+            window.addEventListener('scroll', function () {
+                const navbar = document.getElementById('navbar');
+                if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 50);
+            });
+        }
+
+        function setupDropdownClose() {
+            document.addEventListener('click', function (e) {
+                const dropdown = document.getElementById('userDropdown');
+                const avatarBtn = document.getElementById('userAvatarBtn');
+                const userMenu = document.getElementById('navUserMenu');
+                if (dropdown && avatarBtn && !dropdown.contains(e.target) && !avatarBtn.contains(e.target)) {
+                    dropdown.classList.remove('active');
+                }
+            });
+        }
+
+        // ============================================
+        // STORAGE
+        // ============================================
+        function getFromLocalStorage(key) {
+            try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; }
+        }
+
+        function saveToLocalStorage(key, value) {
+            try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { }
+        }
+
+        // ============================================
+        // NOTIFICATIONS
+        // ============================================
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const title = document.getElementById('notificationTitle');
+            const text = document.getElementById('notificationText');
+            const icon = notification.querySelector('.notification-icon i');
+
+            notification.className = 'notification-toast ' + type;
+
+            const config = {
+                success: { title: 'Success!', icon: 'fa-check-circle' },
+                error: { title: 'Error!', icon: 'fa-exclamation-circle' },
+                warning: { title: 'Warning!', icon: 'fa-exclamation-triangle' },
+                info: { title: 'Info', icon: 'fa-info-circle' }
+            };
+
+            const settings = config[type] || config.success;
+            title.textContent = settings.title;
+            text.textContent = message;
+            icon.className = 'fas ' + settings.icon;
+
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 4000);
+        }
+
+        // ============================================
+        // MODAL FUNCTIONS
+        // ============================================
+        function showLogin() {
+            document.getElementById('authModal').classList.add('active');
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('authModalTitle').textContent = 'Login';
+        }
+
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('authModalTitle').textContent = 'Login';
+        }
+
+        function showRegisterForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('authModalTitle').textContent = 'Create Account';
+        }
+
+        function closeModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        document.getElementById('authModal')?.addEventListener('click', function (e) {
+            if (e.target === this) closeModal();
+        });
+
+        // ============================================
+        // AUTHENTICATION
+        // ============================================
+        function checkLoginStatus() {
+            const user = getFromLocalStorage('currentUser');
+            if (user && user.loggedIn) {
+                currentUser = user;
+                updateUIForLoggedInUser(user);
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const btn = e.target.querySelector('button[type="submit"]');
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = { ...data.data.user, loggedIn: true };
+                    saveToLocalStorage('currentUser', currentUser);
+                    localStorage.setItem('authToken', data.data.token);
+                    updateUIForLoggedInUser(currentUser);
+                    closeModal();
+                    showNotification('Welcome back!', 'success');
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                // Demo fallback
+                currentUser = { id: 'demo-' + Date.now(), name: email.split('@')[0], email, loggedIn: true };
+                saveToLocalStorage('currentUser', currentUser);
+                localStorage.setItem('authToken', 'demo-token');
+                updateUIForLoggedInUser(currentUser);
+                closeModal();
+                showNotification('Welcome! (Demo Mode)', 'success');
+            }
+
+            btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            btn.disabled = false;
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const btn = e.target.querySelector('button[type="submit"]');
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = { ...data.data.user, loggedIn: true };
+                    saveToLocalStorage('currentUser', currentUser);
+                    localStorage.setItem('authToken', data.data.token);
+                    updateUIForLoggedInUser(currentUser);
+                    closeModal();
+                    showNotification('Account created!', 'success');
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                currentUser = { id: 'demo-' + Date.now(), name, email, loggedIn: true };
+                saveToLocalStorage('currentUser', currentUser);
+                localStorage.setItem('authToken', 'demo-token');
+                updateUIForLoggedInUser(currentUser);
+                closeModal();
+                showNotification('Account created! (Demo)', 'success');
+            }
+
+            btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+            btn.disabled = false;
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('authToken');
+            currentUser = null;
+            updateUIForLoggedOutUser();
+            document.getElementById('userDropdown').classList.remove('active');
+            showNotification('Logged out!', 'success');
+        }
+
+        // ============================================
+        // UI UPDATES
+        // ============================================
+        function getUserInitials(name) {
+            if (!name) return 'U';
+            const parts = name.trim().split(' ');
+            return parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : name.substring(0, 2).toUpperCase();
+        }
+
+        function updateUIForLoggedInUser(user) {
+            const name = user.name || user.email?.split('@')[0] || 'User';
+            const initials = getUserInitials(name);
+
+            document.getElementById('navUserMenu').style.display = 'block';
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('userInitials').textContent = initials;
+            document.getElementById('userDropdownAvatar').textContent = initials;
+            document.getElementById('userDropdownName').textContent = name;
+            document.getElementById('userDropdownEmail').textContent = user.email || '';
+
+            // Auto-fill form
+            if (user.name) document.getElementById('fullName').value = user.name;
+            if (user.email) document.getElementById('email').value = user.email;
+        }
+
+        function updateUIForLoggedOutUser() {
+            document.getElementById('navUserMenu').style.display = 'none';
+            document.getElementById('loginBtn').style.display = 'inline-flex';
+        }
+
+       function toggleUserDropdown(event) {
+    event.stopPropagation();  // This prevents the click from bubbling up
+    document.getElementById('userDropdown').classList.toggle('active');
+}
+
+        // ============================================
+        // USER MENU
+        // ============================================// 
+        function viewProfile() {
+            window.location.href = 'my-profile.html';
+        }
+
+        function viewMyAppointments() {
+            window.location.href = 'my-appointments.html';
+        }
+
+        function viewMyPayments() {
+            window.location.href = 'payment-history.html';
+        }
+
+        function showSettings() {
+            window.location.href = 'settings.html';
+        }
+        // ============================================
+        // SERVICE SELECTION
+        // ============================================
+        function selectService(serviceName, price) {
+            const serviceSelect = document.getElementById('service');
+            for (let option of serviceSelect.options) {
+                if (option.value === serviceName) {
+                    option.selected = true;
+                    break;
+                }
+            }
+            selectedPrice = price;
+            document.getElementById('totalAmount').textContent = '₦' + price.toLocaleString();
+            document.getElementById('appointments').scrollIntoView({ behavior: 'smooth' });
+            showNotification(serviceName + ' selected!', 'success');
+        }
+
+        function updatePrice() {
+            const serviceSelect = document.getElementById('service');
+            const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+            const price = parseInt(selectedOption.dataset.price) || 0;
+            selectedPrice = price;
+            document.getElementById('totalAmount').textContent = '₦' + price.toLocaleString();
+        }
+
+        // ============================================
+        // APPOINTMENT & PAYMENT
+        // ============================================
+        async function handleAppointmentSubmit(e) {
+            e.preventDefault();
+
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const service = document.getElementById('service').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const message = document.getElementById('message')?.value || '';
+
+            if (!service || selectedPrice <= 0) {
+                showNotification('Please select a service', 'error');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitBtn.disabled = true;
+
+            // Check if Paystack is loaded
+            if (typeof PaystackPop === 'undefined') {
+                showNotification('Payment system loading... Please try again.', 'warning');
+                submitBtn.innerHTML = '<i class="fas fa-credit-card"></i> Pay & Book Appointment';
+                submitBtn.disabled = false;
+                return;
+            }
+
+            // Initialize Paystack Payment
+            const handler = PaystackPop.setup({
+                key: PAYSTACK_PUBLIC_KEY,
+                email: email,
+                amount: selectedPrice * 100, // Paystack uses kobo (multiply by 100)
+                currency: 'NGN',
+                ref: 'APT-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+                metadata: {
+                    custom_fields: [
+                        { display_name: "Patient Name", variable_name: "patient_name", value: fullName },
+                        { display_name: "Service", variable_name: "service", value: service },
+                        { display_name: "Date", variable_name: "date", value: date },
+                        { display_name: "Time", variable_name: "time", value: time },
+                        { display_name: "Phone", variable_name: "phone", value: phone }
+                    ]
+                },
+                callback: function (response) {
+                    // Payment successful - save appointment to backend
+                    saveAppointmentToBackend({
+                        fullName, email, phone, service, date, time, message,
+                        amount: selectedPrice,
+                        paymentRef: response.reference,
+                        status: 'confirmed'
+                    });
+                },
+                onClose: function () {
+                    submitBtn.innerHTML = '<i class="fas fa-credit-card"></i> Pay & Book Appointment';
+                    submitBtn.disabled = false;
+                    showNotification('Payment cancelled', 'warning');
+                }
+            });
+
+            handler.openIframe();
+        }
+
+        async function saveAppointmentToBackend(appointmentData) {
+            const submitBtn = document.getElementById('submitBtn');
+
+            try {
+                // Save to backend
+                const response = await fetch(`${API_URL}/appointments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (localStorage.getItem('authToken') || '')
+                    },
+                    body: JSON.stringify(appointmentData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('🎉 Appointment booked! Check your email for confirmation.', 'success');
+                    document.getElementById('appointmentForm').reset();
+                    document.getElementById('totalAmount').textContent = '₦0';
+                    selectedPrice = 0;
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                // Still show success since payment went through
+                showNotification('🎉 Payment successful! Appointment booked.', 'success');
+                document.getElementById('appointmentForm').reset();
+                document.getElementById('totalAmount').textContent = '₦0';
+                selectedPrice = 0;
+            }
+
+            submitBtn.innerHTML = '<i class="fas fa-credit-card"></i> Pay & Book Appointment';
+            submitBtn.disabled = false;
+        }
+    </script>
+</body>
+
+</html>

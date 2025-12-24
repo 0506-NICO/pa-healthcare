@@ -1,0 +1,21 @@
+{
+  "name": "healthcare-frontend",
+  "version": "1.0.0",
+  "description": "Healthcare Platform Frontend",
+  "scripts": {
+    "serve": "live-server --port=8080 --host=localhost",
+    "build": "echo 'No build needed - static files'",
+    "dev": "live-server --port=8080"
+  },
+  "keywords": [
+    "healthcare",
+    "medical",
+    "appointments",
+    "frontend"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

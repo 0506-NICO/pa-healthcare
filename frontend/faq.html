@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - P&A Institute of Integrative Medicine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        .logo i {
+            font-size: 2rem;
+        }
+
+        .back-btn {
+            background: #4ecdc4;
+            color: #1a1a2e;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #45b7aa;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-title p {
+            color: #aaa;
+            font-size: 1.1rem;
+        }
+
+        .faq-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .faq-item:hover {
+            border-color: #4ecdc4;
+        }
+
+        .faq-question {
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .faq-question i {
+            color: #4ecdc4;
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .faq-answer-content {
+            padding: 20px 25px;
+            color: #ccc;
+            line-height: 1.8;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+
+        .faq-category {
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4ecdc4;
+            color: #4ecdc4;
+            font-size: 1.3rem;
+        }
+
+        .contact-box {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .contact-box h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #1a1a2e;
+        }
+
+        .contact-box p {
+            color: #1a1a2e;
+            margin-bottom: 20px;
+        }
+
+        .contact-box a {
+            background: #1a1a2e;
+            color: #4ecdc4;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .contact-box a:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+            
+            .page-title h1 {
+                font-size: 2rem;
+            }
+            
+            .faq-question {
+                font-size: 1rem;
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-heartbeat"></i>
+            <span>P&A Institute</span>
+        </div>
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </header>
+
+    <div class="container">
+        <div class="page-title">
+            <h1><i class="fas fa-question-circle"></i> Frequently Asked Questions</h1>
+            <p>Find answers to common questions about our services</p>
+        </div>
+
+        <h2 class="faq-category"><i class="fas fa-calendar-check"></i> Appointments</h2>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>How do I book an appointment?</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Booking is easy! Simply click the "Book Appointment" button on our homepage, select your preferred service, choose a date and time that works for you, fill in your details, and complete the payment. You'll receive a confirmation email immediately.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Can I reschedule or cancel my appointment?</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Yes! You can reschedule or cancel your appointment up to 24 hours before the scheduled time. Log into your account, go to "My Appointments", and select the appointment you wish to modify. For cancellations within 24 hours, please contact us directly.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>What should I bring to my appointment?</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Please bring a valid ID, your appointment confirmation (email or SMS), any relevant medical records or test results, and your payment receipt. If this is your first visit, arrive 10-15 minutes early to complete registration.
+                </div>
+            </div>
+        </div>
+
+        <h2 class="faq-category"><i class="fas fa-credit-card"></i> Payments</h2>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>What payment methods do you accept?</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    We accept multiple payment methods including: Debit/Credit Cards (Visa, Mastercard, Verve), Bank Transfers, USSD payments, and mobile money. All payments are processed securely through Paystack.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Is my payment information secure?</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Absolutely! We use Paystack, a PCI-DSS compliant payment processor. Your card details are encrypted and never stored on our servers. All transactions are protected with bank-level security.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Can I get a refund?</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Refunds are available for cancellations made at least 24 hours before your appointment. Refunds are processed within 5-7 business days to your original payment method. For emergencies, please contact our support team.
+                </div>
+            </div>
+        </div>
+
+        <h2 class="faq-category"><i class="fas fa-user"></i> Account & Profile</h2>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>How do I create an account?</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Click the "Register" button on our website, fill in your name, email, phone number, and create a password. You'll receive a verification email - click the link to activate your account. That's it!
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>I forgot my password. What do I do?</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Click "Forgot Password" on the login page, enter your registered email address, and we'll send you a password reset link. The link expires in 1 hour for security reasons.
+                </div>
+            </div>
+        </div>
+
+        <h2 class="faq-category"><i class="fas fa-hospital"></i> Services</h2>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>What services do you offer?</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    We offer a comprehensive range of healthcare services including: General Consultation, Laboratory Tests, Specialized Care, Mental Health Services, Emergency Care, Eye Care, and more. Visit our Services page for detailed information and pricing.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Do you offer emergency services?</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Yes, we provide emergency care services. For life-threatening emergencies, please call emergency services (112) or visit the nearest hospital immediately. For urgent but non-life-threatening issues, contact our emergency line.
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-box">
+            <h3><i class="fas fa-headset"></i> Still have questions?</h3>
+            <p>Our support team is here to help you 24/7</p>
+            <a href="help-center.html"><i class="fas fa-envelope"></i> Contact Support</a>
+        </div>
+    </div>
+
+    <script>
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                const isActive = item.classList.contains('active');
+                
+                // Close all items
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+                
+                // Open clicked item if it wasn't active
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

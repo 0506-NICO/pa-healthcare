@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - P&A Institute</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        .header {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+        .back-btn {
+            background: #4ecdc4;
+            color: #1a1a2e;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .back-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(78,205,196,0.3); }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .page-title { text-align: center; margin-bottom: 40px; }
+        .page-title h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .profile-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #1a1a2e;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .avatar-edit {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            padding: 8px;
+            text-align: center;
+            color: #fff;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .avatar:hover .avatar-edit { opacity: 1; }
+        .profile-info h2 { font-size: 1.8rem; margin-bottom: 5px; }
+        .profile-info p { color: #aaa; }
+        .profile-info .badge {
+            display: inline-block;
+            background: rgba(78, 205, 196, 0.2);
+            color: #4ecdc4;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+        .form-section h3 {
+            color: #4ecdc4;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group.full-width { grid-column: span 2; }
+        .form-group label { display: block; margin-bottom: 8px; color: #ccc; font-weight: 500; }
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .form-group input:focus { outline: none; border-color: #4ecdc4; background: rgba(78,205,196,0.1); }
+        .form-group input:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-group { display: flex; gap: 15px; margin-top: 30px; }
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: #1a1a2e;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(78, 205, 196, 0.3); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.2); }
+        .btn-danger {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+        .btn-danger:hover { background: #e74c3c; color: #fff; }
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-success {
+            background: rgba(39, 174, 96, 0.2);
+            border: 1px solid #27ae60;
+            color: #27ae60;
+        }
+        .alert.show { display: flex; }
+        .quick-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
+        .quick-link {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        .quick-link:hover { border-color: #4ecdc4; transform: translateY(-5px); }
+        .quick-link i { font-size: 2rem; color: #4ecdc4; margin-bottom: 15px; display: block; }
+        .quick-link h4 { margin-bottom: 5px; }
+        .quick-link p { color: #aaa; font-size: 0.9rem; }
+        .danger-zone {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+        .danger-zone h4 { color: #e74c3c; margin-bottom: 10px; }
+        .danger-zone p { color: #aaa; margin-bottom: 20px; font-size: 0.9rem; }
+        .file-input { display: none; }
+        @media (max-width: 768px) {
+            .profile-header { flex-direction: column; text-align: center; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full-width { grid-column: span 1; }
+            .quick-links { grid-template-columns: 1fr; }
+            .btn-group { flex-direction: column; }
+            .header { padding: 15px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-heartbeat"></i>
+            <span>P&A Institute</span>
+        </div>
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </header>
+
+    <div class="container">
+        <div class="page-title">
+            <h1><i class="fas fa-user-circle"></i> My Profile</h1>
+        </div>
+
+        <div class="alert alert-success" id="successAlert">
+            <i class="fas fa-check-circle"></i>
+            <span id="alertMessage">Profile updated successfully!</span>
+        </div>
+
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="avatar" id="avatarContainer" onclick="changeProfilePicture()">
+                    <span id="avatarInitials">U</span>
+                    <div class="avatar-edit"><i class="fas fa-camera"></i> Change</div>
+                </div>
+                <input type="file" id="avatarInput" class="file-input" accept="image/*">
+                <div class="profile-info">
+                    <h2 id="displayName">Loading...</h2>
+                    <p id="displayEmail">Loading...</p>
+                    <span class="badge"><i class="fas fa-check-circle"></i> Verified Account</span>
+                </div>
+            </div>
+
+            <form id="profileForm">
+                <div class="form-section">
+                    <h3><i class="fas fa-user"></i> Personal Information</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" placeholder="Enter your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="+234 XXX XXX XXXX">
+                        </div>
+                        <div class="form-group">
+                            <label for="dob">Date of Birth</label>
+                            <input type="date" id="dob" name="dob">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section" style="margin-top: 30px;">
+                    <h3><i class="fas fa-lock"></i> Change Password</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <input type="password" id="currentPassword" name="currentPassword" placeholder="Enter current password">
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary" id="saveBtn">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <h3 style="color: #4ecdc4; margin-bottom: 20px;"><i class="fas fa-th-large"></i> Quick Links</h3>
+        <div class="quick-links">
+            <a href="my-appointments.html" class="quick-link">
+                <i class="fas fa-calendar-check"></i>
+                <h4>My Appointments</h4>
+                <p>View & manage bookings</p>
+            </a>
+            <a href="payment-history.html" class="quick-link">
+                <i class="fas fa-credit-card"></i>
+                <h4>Payment History</h4>
+                <p>View transactions</p>
+            </a>
+            <a href="settings.html" class="quick-link">
+                <i class="fas fa-cog"></i>
+                <h4>Settings</h4>
+                <p>Account preferences</p>
+            </a>
+        </div>
+
+        <div class="danger-zone">
+            <h4><i class="fas fa-exclamation-triangle"></i> Danger Zone</h4>
+            <p>Once you delete your account, there is no going back. Please be certain.</p>
+            <button class="btn btn-danger" onclick="confirmDelete()">
+                <i class="fas fa-trash"></i> Delete Account
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5002/api';
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (!user || !user.loggedIn) {
+                alert('Please login first');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            loadProfile();
+            setupAvatarUpload();
+        });
+
+        // ============================================
+        // LOAD PROFILE
+        // ============================================
+        function loadProfile() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            
+            // Set form values
+            document.getElementById('name').value = user.name || '';
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('phone').value = user.phone || '';
+            document.getElementById('dob').value = user.dob || '';
+            
+            // Set display values
+            const displayName = user.name || user.email?.split('@')[0] || 'User';
+            document.getElementById('displayName').textContent = displayName;
+            document.getElementById('displayEmail').textContent = user.email || '';
+            
+            // Set avatar
+            if (user.avatar) {
+                document.getElementById('avatarContainer').innerHTML = `
+                    <img src="${user.avatar}" alt="Profile">
+                    <div class="avatar-edit"><i class="fas fa-camera"></i> Change</div>
+                `;
+            } else {
+                const initials = getInitials(displayName);
+                document.getElementById('avatarInitials').textContent = initials;
+            }
+            
+            // Try to fetch from server (optional - won't break if fails)
+            fetchProfileFromServer();
+        }
+
+        // ============================================
+        // FETCH FROM SERVER (OPTIONAL)
+        // ============================================
+        async function fetchProfileFromServer() {
+            const token = localStorage.getItem('authToken');
+            if (!token) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/users/profile`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data) {
+                        // Update form with server data
+                        if (data.data.name) document.getElementById('name').value = data.data.name;
+                        if (data.data.phone) document.getElementById('phone').value = data.data.phone;
+                        
+                        // Update localStorage
+                        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                        user.name = data.data.name || user.name;
+                        user.phone = data.data.phone || user.phone;
+                        localStorage.setItem('currentUser', JSON.stringify(user));
+                    }
+                }
+            } catch (error) {
+                console.log('Could not fetch from server, using local data');
+            }
+        }
+
+        // ============================================
+        // SAVE PROFILE
+        // ============================================
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            saveBtn.disabled = true;
+            
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                dob: document.getElementById('dob').value
+            };
+            
+            // Password change
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            
+            if (currentPassword && newPassword) {
+                if (newPassword.length < 6) {
+                    showAlert('New password must be at least 6 characters', 'error');
+                    resetSaveButton();
+                    return;
+                }
+                formData.currentPassword = currentPassword;
+                formData.newPassword = newPassword;
+            }
+            
+            // Always save to localStorage first
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            user.name = formData.name;
+            user.phone = formData.phone;
+            user.dob = formData.dob;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            // Update display
+            document.getElementById('displayName').textContent = formData.name || 'User';
+            const initials = getInitials(formData.name);
+            if (!user.avatar) {
+                document.getElementById('avatarInitials').textContent = initials;
+            }
+            
+            // Try to save to server
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                try {
+                    const response = await fetch(`${API_URL}/users/profile`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!data.success && data.message) {
+                        console.log('Server response:', data.message);
+                    }
+                } catch (error) {
+                    console.log('Server save failed, but local save succeeded');
+                }
+            }
+            
+            // Clear password fields
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            
+            // Show success
+            showAlert('Profile updated successfully!');
+            resetSaveButton();
+        });
+
+        // ============================================
+        // AVATAR UPLOAD
+        // ============================================
+        function setupAvatarUpload() {
+            const avatarInput = document.getElementById('avatarInput');
+            
+            avatarInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                // Validate file size (max 2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    showAlert('Image too large. Please select an image under 2MB.', 'error');
+                    return;
+                }
+                
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    showAlert('Please select a valid image file.', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imageData = event.target.result;
+                    
+                    // Update avatar display
+                    document.getElementById('avatarContainer').innerHTML = `
+                        <img src="${imageData}" alt="Profile">
+                        <div class="avatar-edit"><i class="fas fa-camera"></i> Change</div>
+                    `;
+                    
+                    // Save to localStorage
+                    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                    user.avatar = imageData;
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    
+                    showAlert('Profile picture updated!');
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function changeProfilePicture() {
+            document.getElementById('avatarInput').click();
+        }
+
+        // ============================================
+        // HELPER FUNCTIONS
+        // ============================================
+        function getInitials(name) {
+            if (!name) return 'U';
+            const parts = name.trim().split(' ');
+            if (parts.length >= 2) {
+                return (parts[0][0] + parts[1][0]).toUpperCase();
+            }
+            return name.substring(0, 2).toUpperCase();
+        }
+
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('successAlert');
+            const alertMessage = document.getElementById('alertMessage');
+            
+            alertMessage.textContent = message;
+            
+            if (type === 'error') {
+                alert.style.background = 'rgba(231, 76, 60, 0.2)';
+                alert.style.borderColor = '#e74c3c';
+                alert.style.color = '#e74c3c';
+            } else {
+                alert.style.background = 'rgba(39, 174, 96, 0.2)';
+                alert.style.borderColor = '#27ae60';
+                alert.style.color = '#27ae60';
+            }
+            
+            alert.classList.add('show');
+            
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 3000);
+        }
+
+        function resetSaveButton() {
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+            saveBtn.disabled = false;
+        }
+
+        function resetForm() {
+            loadProfile();
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            showAlert('Form reset to saved values');
+        }
+
+        function confirmDelete() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                const confirmText = prompt('Type DELETE to confirm account deletion:');
+                if (confirmText === 'DELETE') {
+                    // Clear all user data
+                    localStorage.removeItem('currentUser');
+                    localStorage.removeItem('authToken');
+                    
+                    showAlert('Account deleted. Redirecting...');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    showAlert('Account deletion cancelled', 'error');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

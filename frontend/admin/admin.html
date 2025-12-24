@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - P&A Institute</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --bg-primary:#0f172a; --bg-secondary:#1e293b; --bg-card:#1e293b; --bg-input:#334155; --text-primary:#f1f5f9; --text-secondary:#94a3b8; --text-muted:#64748b; --primary:#10b981; --primary-dark:#059669; --accent:#3dd9a4; --success:#10b981; --warning:#f59e0b; --danger:#ef4444; --info:#3b82f6; --border:rgba(255,255,255,0.1); }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg-primary); color:var(--text-primary); min-height:100vh; }
+        .login-screen { min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--bg-primary),#1a2744); padding:20px; }
+        .login-screen.hidden { display:none; }
+        .login-card { background:var(--bg-card); border-radius:20px; padding:50px; width:100%; max-width:420px; box-shadow:0 25px 80px rgba(0,0,0,0.4); border:1px solid var(--border); }
+        .login-logo { text-align:center; margin-bottom:35px; }
+        .login-logo-icon { width:70px; height:70px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:32px; margin:0 auto 15px; }
+        .login-logo h1 { font-size:1.5rem; font-weight:700; }
+        .login-logo p { color:var(--text-muted); font-size:0.9rem; }
+        .form-group { margin-bottom:20px; }
+        .form-label { display:block; font-size:0.875rem; font-weight:500; color:var(--text-secondary); margin-bottom:8px; }
+        .form-input { width:100%; padding:14px 16px; background:var(--bg-input); border:2px solid transparent; border-radius:10px; color:var(--text-primary); font-size:0.95rem; transition:all 0.2s; }
+        .form-input:focus { outline:none; border-color:var(--primary); background:rgba(16,185,129,0.1); }
+        .form-input::placeholder { color:var(--text-muted); }
+        .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 28px; font-size:0.95rem; font-weight:600; border-radius:10px; cursor:pointer; transition:all 0.3s; border:none; font-family:inherit; }
+        .btn-primary { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:white; width:100%; }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(16,185,129,0.3); }
+        .btn-secondary { background:var(--bg-input); color:var(--text-primary); }
+        .login-error { background:rgba(239,68,68,0.1); border:1px solid var(--danger); color:var(--danger); padding:12px; border-radius:8px; font-size:0.875rem; margin-bottom:20px; display:none; }
+        .login-error.show { display:block; }
+        .login-demo { text-align:center; margin-top:25px; padding-top:25px; border-top:1px solid var(--border); color:var(--text-muted); font-size:0.85rem; }
+        .login-demo strong { color:var(--accent); }
+        .admin-dashboard { display:none; min-height:100vh; }
+        .admin-dashboard.active { display:flex; }
+        .sidebar { width:260px; background:var(--bg-secondary); border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; height:100vh; z-index:100; }
+        .sidebar-header { padding:25px; border-bottom:1px solid var(--border); }
+        .sidebar-logo { display:flex; align-items:center; gap:12px; }
+        .sidebar-logo-icon { width:45px; height:45px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+        .sidebar-logo-text { font-weight:700; font-size:1.1rem; }
+        .sidebar-logo-text span { display:block; font-size:0.75rem; font-weight:400; color:var(--text-muted); }
+        .sidebar-nav { flex:1; padding:20px 15px; overflow-y:auto; }
+        .nav-section { margin-bottom:25px; }
+        .nav-section-title { font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); padding:0 15px; margin-bottom:10px; }
+        .nav-item { display:flex; align-items:center; gap:12px; padding:12px 15px; border-radius:10px; color:var(--text-secondary); cursor:pointer; transition:all 0.2s; margin-bottom:5px; }
+        .nav-item:hover { background:rgba(255,255,255,0.05); color:var(--text-primary); }
+        .nav-item.active { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:white; }
+        .nav-item i { width:20px; font-size:1rem; }
+        .nav-badge { margin-left:auto; background:var(--danger); color:white; font-size:0.7rem; padding:2px 8px; border-radius:10px; }
+        .sidebar-footer { padding:20px; border-top:1px solid var(--border); }
+        .admin-profile { display:flex; align-items:center; gap:12px; cursor:pointer; padding:10px; border-radius:10px; transition:background 0.2s; position:relative; }
+        .admin-profile:hover { background:rgba(255,255,255,0.05); }
+        .admin-avatar { width:40px; height:40px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px; }
+        .admin-info { flex:1; }
+        .admin-name { font-weight:600; font-size:0.9rem; }
+        .admin-role { font-size:0.75rem; color:var(--text-muted); }
+        .admin-dropdown { position:absolute; bottom:100%; left:0; right:0; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; margin-bottom:10px; box-shadow:0 -10px 40px rgba(0,0,0,0.3); display:none; overflow:hidden; z-index:200; }
+        .admin-dropdown.show { display:block; }
+        .admin-dropdown-item { display:flex; align-items:center; gap:12px; padding:12px 15px; color:var(--text-secondary); cursor:pointer; transition:all 0.2s; }
+        .admin-dropdown-item:hover { background:rgba(255,255,255,0.05); color:var(--text-primary); }
+        .admin-dropdown-item.danger { color:var(--danger); }
+        .admin-dropdown-item.danger:hover { background:rgba(239,68,68,0.1); }
+        .admin-dropdown-divider { height:1px; background:var(--border); margin:5px 0; }
+        .main-content { flex:1; margin-left:260px; min-height:100vh; }
+        .main-header { background:var(--bg-secondary); padding:20px 30px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; }
+        .page-title { font-size:1.5rem; font-weight:700; }
+        .header-actions { display:flex; align-items:center; gap:15px; position:relative; }
+        .header-btn { width:42px; height:42px; background:var(--bg-input); border:none; border-radius:10px; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; justify-content:center; position:relative; transition:all 0.2s; }
+        .header-btn:hover { background:var(--primary); color:white; }
+        .header-btn .badge { position:absolute; top:-5px; right:-5px; width:18px; height:18px; background:var(--danger); border-radius:50%; font-size:0.65rem; display:flex; align-items:center; justify-content:center; }
+        .main-body { padding:30px; }
+        .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:25px; margin-bottom:30px; }
+        .stat-card { background:var(--bg-card); border-radius:16px; padding:25px; border:1px solid var(--border); }
+        .stat-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; }
+        .stat-icon { width:50px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+        .stat-icon.blue { background:rgba(59,130,246,0.15); color:var(--info); }
+        .stat-icon.green { background:rgba(16,185,129,0.15); color:var(--success); }
+        .stat-icon.yellow { background:rgba(245,158,11,0.15); color:var(--warning); }
+        .stat-icon.purple { background:rgba(139,92,246,0.15); color:#8b5cf6; }
+        .stat-value { font-size:1.8rem; font-weight:700; margin-bottom:5px; }
+        .stat-label { color:var(--text-muted); font-size:0.9rem; }
+        .dashboard-grid { display:grid; grid-template-columns:2fr 1fr; gap:25px; margin-bottom:30px; }
+        .card { background:var(--bg-card); border-radius:16px; border:1px solid var(--border); overflow:hidden; }
+        .card-header { padding:20px 25px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+        .card-title { font-size:1.1rem; font-weight:600; }
+        .card-body { padding:25px; }
+        .chart-container { height:300px; position:relative; }
+        .chart-btns { display:flex; gap:8px; }
+        .chart-btn { padding:6px 14px; background:var(--bg-input); border:none; border-radius:6px; color:var(--text-secondary); font-size:0.8rem; cursor:pointer; transition:all 0.2s; }
+        .chart-btn.active,.chart-btn:hover { background:var(--primary); color:white; }
+        .service-item { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+        .service-item:last-child { border-bottom:none; }
+        .service-color { width:10px; height:10px; border-radius:50%; }
+        .service-info { flex:1; }
+        .service-name { font-weight:500; font-size:0.9rem; }
+        .service-count { font-size:0.8rem; color:var(--text-muted); }
+        .service-percentage { font-weight:600; color:var(--accent); }
+        .table-wrapper { overflow-x:auto; }
+        .data-table { width:100%; border-collapse:collapse; }
+        .data-table th,.data-table td { padding:15px; text-align:left; border-bottom:1px solid var(--border); }
+        .data-table th { font-size:0.8rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); font-weight:600; }
+        .data-table tr:hover { background:rgba(255,255,255,0.02); }
+        .patient-info { display:flex; align-items:center; gap:12px; }
+        .patient-avatar { width:38px; height:38px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:12px; }
+        .patient-name { font-weight:500; }
+        .patient-email { font-size:0.8rem; color:var(--text-muted); }
+        .status-badge { display:inline-block; padding:5px 12px; border-radius:20px; font-size:0.75rem; font-weight:500; text-transform:capitalize; }
+        .status-badge.pending { background:rgba(245,158,11,0.15); color:var(--warning); }
+        .status-badge.confirmed { background:rgba(16,185,129,0.15); color:var(--success); }
+        .status-badge.completed { background:rgba(59,130,246,0.15); color:var(--info); }
+        .status-badge.cancelled { background:rgba(239,68,68,0.15); color:var(--danger); }
+        .action-btns { display:flex; gap:8px; }
+        .action-btn { width:32px; height:32px; border-radius:8px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+        .action-btn.view { background:rgba(59,130,246,0.15); color:var(--info); }
+        .action-btn.approve { background:rgba(16,185,129,0.15); color:var(--success); }
+        .action-btn.cancel { background:rgba(239,68,68,0.15); color:var(--danger); }
+        .action-btn:hover { transform:scale(1.1); }
+        .page-section { display:none; }
+        .page-section.active { display:block; }
+        .users-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+        .user-card { background:var(--bg-card); border-radius:16px; padding:25px; border:1px solid var(--border); text-align:center; }
+        .user-avatar-lg { width:70px; height:70px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:600; margin:0 auto 15px; }
+        .user-card h4 { font-size:1.1rem; margin-bottom:5px; }
+        .user-card p { color:var(--text-muted); font-size:0.85rem; margin-bottom:5px; }
+        .user-card .user-phone { font-size:0.8rem; color:var(--text-secondary); margin-bottom:15px; }
+        .user-card .user-role { display:inline-block; background:rgba(16,185,129,0.15); color:var(--success); padding:4px 12px; border-radius:20px; font-size:0.75rem; margin-bottom:15px; }
+        .user-stats { display:flex; justify-content:center; gap:30px; margin-bottom:20px; }
+        .user-stat { text-align:center; }
+        .user-stat-value { font-size:1.2rem; font-weight:700; color:var(--accent); }
+        .user-stat-label { font-size:0.75rem; color:var(--text-muted); }
+        .user-actions { display:flex; gap:10px; justify-content:center; }
+        .user-actions .btn { padding:8px 16px; font-size:0.8rem; }
+        .settings-layout { display:grid; grid-template-columns:250px 1fr; gap:30px; }
+        .settings-nav { background:var(--bg-card); border-radius:16px; padding:15px; border:1px solid var(--border); height:fit-content; }
+        .settings-nav-item { display:flex; align-items:center; gap:12px; padding:12px 15px; border-radius:10px; color:var(--text-secondary); cursor:pointer; transition:all 0.2s; margin-bottom:5px; }
+        .settings-nav-item:hover,.settings-nav-item.active { background:var(--primary); color:white; }
+        .settings-content { background:var(--bg-card); border-radius:16px; padding:30px; border:1px solid var(--border); }
+        .settings-section h3 { font-size:1.2rem; margin-bottom:25px; padding-bottom:15px; border-bottom:1px solid var(--border); }
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+        .form-row.single { grid-template-columns:1fr; }
+        .filter-btn { padding:10px 20px; background:var(--bg-input); border:none; border-radius:8px; color:var(--text-primary); cursor:pointer; font-size:0.9rem; transition:all 0.2s; display:inline-flex; align-items:center; gap:8px; }
+        .filter-btn:hover,.filter-btn.btn-primary { background:var(--primary); color:white; }
+        .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; padding:20px; }
+        .modal-overlay.show { display:flex; }
+        .modal { background:var(--bg-card); border-radius:20px; width:100%; max-width:500px; max-height:90vh; overflow-y:auto; border:1px solid var(--border); }
+        .modal-header { padding:25px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+        .modal-title { font-size:1.25rem; font-weight:600; }
+        .modal-close { width:36px; height:36px; background:var(--bg-input); border:none; border-radius:50%; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+        .modal-close:hover { background:var(--danger); color:white; }
+        .modal-body { padding:25px; }
+        .modal-footer { padding:20px 25px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; }
+        .notifications-dropdown { position:absolute; top:60px; right:0; width:380px; background:var(--bg-card); border-radius:16px; border:1px solid var(--border); box-shadow:0 20px 50px rgba(0,0,0,0.4); z-index:1000; display:none; }
+        .notifications-dropdown.show { display:block; }
+        .notif-header { padding:20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+        .notif-header h4 { font-size:1rem; }
+        .notif-clear { background:none; border:none; color:var(--primary); font-size:0.85rem; cursor:pointer; }
+        .notif-list { max-height:350px; overflow-y:auto; }
+        .notif-item { padding:15px 20px; border-bottom:1px solid var(--border); display:flex; gap:12px; cursor:pointer; transition:background 0.2s; }
+        .notif-item:hover { background:rgba(255,255,255,0.03); }
+        .notif-item.unread { background:rgba(16,185,129,0.05); }
+        .notif-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .notif-content { flex:1; }
+        .notif-title { font-weight:500; font-size:0.9rem; margin-bottom:3px; }
+        .notif-text { font-size:0.8rem; color:var(--text-muted); }
+        .notif-time { font-size:0.75rem; color:var(--text-muted); margin-top:5px; }
+        .notification { position:fixed; top:20px; right:20px; background:var(--bg-card); border-radius:12px; padding:16px 20px; display:flex; align-items:center; gap:12px; box-shadow:0 10px 40px rgba(0,0,0,0.3); border-left:4px solid var(--success); z-index:10000; transform:translateX(120%); transition:transform 0.3s ease; }
+        .notification.show { transform:translateX(0); }
+        .notification.success { border-left-color:var(--success); }
+        .notification.error { border-left-color:var(--danger); }
+        .notification.warning { border-left-color:var(--warning); }
+        .notification.info { border-left-color:var(--info); }
+        .loading-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.9); display:flex; align-items:center; justify-content:center; z-index:9999; }
+        .loading-overlay.hidden { display:none; }
+        .spinner { width:50px; height:50px; border:4px solid var(--bg-input); border-top-color:var(--primary); border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
+        .empty-state i { font-size:4rem; margin-bottom:20px; opacity:0.5; display:block; }
+        @media (max-width:1200px) { .stats-grid { grid-template-columns:repeat(2,1fr); } .dashboard-grid { grid-template-columns:1fr; } .users-grid { grid-template-columns:repeat(2,1fr); } }
+        @media (max-width:768px) { .sidebar { transform:translateX(-100%); transition:transform 0.3s; } .sidebar.open { transform:translateX(0); } .main-content { margin-left:0; } .stats-grid,.users-grid { grid-template-columns:1fr; } .settings-layout { grid-template-columns:1fr; } .form-row { grid-template-columns:1fr; } #menuToggle { display:flex !important; } }
+    </style>
+</head>
+<body>
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo"><div class="login-logo-icon">🏥</div><h1>P&A Admin</h1><p>Healthcare Management System</p></div>
+            <div class="login-error" id="loginError">Invalid credentials</div>
+            <form id="adminLoginForm">
+                <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-input" id="adminEmail" placeholder="admin@example.com" required></div>
+                <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="adminPassword" placeholder="••••••••" required></div>
+                <button type="submit" class="btn btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+            </form>
+            <div class="login-demo">Demo: <strong>miniquehairs@gmail.com</strong> / <strong>Ominipotent440#</strong></div>
+        </div>
+    </div>
+
+    <div class="admin-dashboard" id="adminDashboard">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header"><div class="sidebar-logo"><div class="sidebar-logo-icon">🏥</div><div class="sidebar-logo-text">P&A Admin<span>Dashboard</span></div></div></div>
+            <nav class="sidebar-nav">
+                <div class="nav-section"><div class="nav-section-title">Main Menu</div>
+                    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><i class="fas fa-th-large"></i><span>Dashboard</span></div>
+                    <div class="nav-item" data-page="appointments" onclick="showPage('appointments')"><i class="fas fa-calendar-check"></i><span>Appointments</span><span class="nav-badge" id="pendingBadge">0</span></div>
+                    <div class="nav-item" data-page="users" onclick="showPage('users')"><i class="fas fa-users"></i><span>Users</span></div>
+                    <div class="nav-item" data-page="payments" onclick="showPage('payments')"><i class="fas fa-credit-card"></i><span>Payments</span></div>
+                </div>
+                <div class="nav-section"><div class="nav-section-title">Management</div>
+                    <div class="nav-item" data-page="services" onclick="showPage('services')"><i class="fas fa-stethoscope"></i><span>Services</span></div>
+                    <div class="nav-item" data-page="reports" onclick="showPage('reports')"><i class="fas fa-chart-bar"></i><span>Reports</span></div>
+                    <div class="nav-item" data-page="settings" onclick="showPage('settings')"><i class="fas fa-cog"></i><span>Settings</span></div>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="admin-profile" id="adminProfile" onclick="toggleAdminDropdown(event)">
+                    <div class="admin-avatar" id="adminAvatar">AD</div>
+                    <div class="admin-info"><div class="admin-name" id="adminName">Admin</div><div class="admin-role">Administrator</div></div>
+                    <i class="fas fa-chevron-up" id="adminChevron"></i>
+                    <div class="admin-dropdown" id="adminDropdown">
+                        <div class="admin-dropdown-item" onclick="showAdminProfile()"><i class="fas fa-user"></i> My Profile</div>
+                        <div class="admin-dropdown-item" onclick="showPage('settings')"><i class="fas fa-cog"></i> Settings</div>
+                        <div class="admin-dropdown-divider"></div>
+                        <div class="admin-dropdown-item danger" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <div style="display:flex;align-items:center;gap:15px;"><button class="header-btn" id="menuToggle" onclick="toggleSidebar()" style="display:none;"><i class="fas fa-bars"></i></button><h1 class="page-title" id="pageTitle">Dashboard</h1></div>
+                <div class="header-actions">
+                    <button class="header-btn" onclick="refreshData()" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+                    <button class="header-btn" onclick="toggleNotifications()"><i class="fas fa-bell"></i><span class="badge" id="notifBadge">3</span></button>
+                    <button class="header-btn" onclick="handleLogout()" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+                    <div class="notifications-dropdown" id="notificationsDropdown"><div class="notif-header"><h4>Notifications</h4><button class="notif-clear" onclick="clearNotifications()">Clear all</button></div><div class="notif-list" id="notifList"></div></div>
+                </div>
+            </header>
+
+            <div class="main-body">
+                <div class="page-section active" id="dashboardPage">
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-header"><div class="stat-icon blue"><i class="fas fa-calendar-check"></i></div></div><div class="stat-value" id="totalAppointments">0</div><div class="stat-label">Total Appointments</div></div>
+                        <div class="stat-card"><div class="stat-header"><div class="stat-icon green"><i class="fas fa-naira-sign"></i></div></div><div class="stat-value" id="totalRevenue">₦0</div><div class="stat-label">Total Revenue</div></div>
+                        <div class="stat-card"><div class="stat-header"><div class="stat-icon yellow"><i class="fas fa-clock"></i></div></div><div class="stat-value" id="pendingAppointments">0</div><div class="stat-label">Pending</div></div>
+                        <div class="stat-card"><div class="stat-header"><div class="stat-icon purple"><i class="fas fa-users"></i></div></div><div class="stat-value" id="totalUsers">0</div><div class="stat-label">Total Users</div></div>
+                    </div>
+                    <div class="dashboard-grid">
+                        <div class="card"><div class="card-header"><h3 class="card-title">Revenue Overview</h3><div class="chart-btns"><button class="chart-btn active" onclick="updateChart('week')">Week</button><button class="chart-btn" onclick="updateChart('month')">Month</button><button class="chart-btn" onclick="updateChart('year')">Year</button></div></div><div class="card-body"><div class="chart-container"><canvas id="revenueChart"></canvas></div></div></div>
+                        <div class="card"><div class="card-header"><h3 class="card-title">Popular Services</h3></div><div class="card-body"><div id="servicesList"></div></div></div>
+                    </div>
+                    <div class="card"><div class="card-header"><h3 class="card-title">Recent Appointments</h3><button class="filter-btn" onclick="showPage('appointments')">View All</button></div><div class="card-body"><div class="table-wrapper"><table class="data-table"><thead><tr><th>Patient</th><th>Service</th><th>Date & Time</th><th>Status</th><th>Actions</th></tr></thead><tbody id="recentAppointmentsTable"></tbody></table></div></div></div>
+                </div>
+
+                <div class="page-section" id="appointmentsPage">
+                    <div class="card"><div class="card-header"><h3 class="card-title">All Appointments</h3><div style="display:flex;gap:10px;"><select class="form-input" id="statusFilter" style="width:auto;" onchange="filterAppointments()"><option value="">All Status</option><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select><button class="filter-btn btn-primary" onclick="exportData()"><i class="fas fa-download"></i> Export</button></div></div><div class="card-body"><div class="table-wrapper"><table class="data-table"><thead><tr><th>Patient</th><th>Service</th><th>Date</th><th>Time</th><th>Status</th><th>Amount</th><th>Actions</th></tr></thead><tbody id="allAppointmentsTable"></tbody></table></div></div></div>
+                </div>
+
+                <div class="page-section" id="usersPage">
+                    <div class="card" style="margin-bottom:20px;"><div class="card-header"><h3 class="card-title">All Registered Users</h3><button class="filter-btn" onclick="refreshData()"><i class="fas fa-sync-alt"></i> Refresh</button></div></div>
+                    <div class="users-grid" id="usersGrid"></div>
+                </div>
+
+                <div class="page-section" id="paymentsPage">
+                    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:30px;">
+                        <div class="stat-card"><div class="stat-header"><div class="stat-icon green"><i class="fas fa-naira-sign"></i></div></div><div class="stat-value" id="todayRevenue">₦0</div><div class="stat-label">Today's Revenue</div></div>
+                        <div class="stat-card"><div class="stat-header"><div class="stat-icon blue"><i class="fas fa-receipt"></i></div></div><div class="stat-value" id="todayTransactions">0</div><div class="stat-label">Today's Transactions</div></div>
+                        <div class="stat-card"><div class="stat-header"><div class="stat-icon purple"><i class="fas fa-chart-line"></i></div></div><div class="stat-value" id="monthlyRevenue">₦0</div><div class="stat-label">This Month</div></div>
+                    </div>
+                    <div class="card"><div class="card-header"><h3 class="card-title">Payment History</h3></div><div class="card-body"><div class="table-wrapper"><table class="data-table"><thead><tr><th>Reference</th><th>Patient</th><th>Service</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead><tbody id="paymentsTable"></tbody></table></div></div></div>
+                </div>
+
+                <div class="page-section" id="servicesPage">
+                    <div class="card"><div class="card-header"><h3 class="card-title">Manage Services</h3><button class="filter-btn btn-primary" onclick="showAddServiceModal()"><i class="fas fa-plus"></i> Add Service</button></div><div class="card-body"><div class="table-wrapper"><table class="data-table"><thead><tr><th>Service Name</th><th>Category</th><th>Price</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead><tbody id="servicesTable"></tbody></table></div></div></div>
+                </div>
+
+                <div class="page-section" id="reportsPage">
+                    <div class="dashboard-grid">
+                        <div class="card"><div class="card-header"><h3 class="card-title">Monthly Appointments</h3></div><div class="card-body"><div class="chart-container"><canvas id="appointmentsChart"></canvas></div></div></div>
+                        <div class="card"><div class="card-header"><h3 class="card-title">Revenue by Service</h3></div><div class="card-body"><div class="chart-container"><canvas id="serviceRevenueChart"></canvas></div></div></div>
+                    </div>
+                </div>
+
+                <div class="page-section" id="settingsPage">
+                    <div class="settings-layout">
+                        <div class="settings-nav">
+                            <div class="settings-nav-item active" onclick="showSettingsTab('business')"><i class="fas fa-building"></i> Business Info</div>
+                            <div class="settings-nav-item" onclick="showSettingsTab('email')"><i class="fas fa-envelope"></i> Email Settings</div>
+                            <div class="settings-nav-item" onclick="showSettingsTab('payment')"><i class="fas fa-credit-card"></i> Payment</div>
+                            <div class="settings-nav-item" onclick="showSettingsTab('security')"><i class="fas fa-shield-alt"></i> Security</div>
+                        </div>
+                        <div class="settings-content" id="settingsContent"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modal"><div class="modal"><div class="modal-header"><h3 class="modal-title" id="modalTitle">Modal</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body" id="modalBody"></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" id="modalActionBtn">Save</button></div></div></div>
+    <div class="notification" id="notification"><i class="fas fa-check-circle" id="notifIcon"></i><span id="notificationText">Success!</span></div>
+    <div class="loading-overlay hidden" id="loadingOverlay"><div class="spinner"></div></div>
+    <script>
+        const API_URL = 'http://localhost:5002/api';
+        let currentAdmin = null, appointments = [], users = [], payments = [], services = [], revenueChart = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedAdmin = localStorage.getItem('adminUser');
+            if (savedAdmin) { currentAdmin = JSON.parse(savedAdmin); showDashboard(); loadAllData(); }
+            document.getElementById('adminLoginForm').addEventListener('submit', handleLogin);
+            document.addEventListener('click', function(e) { const notifDropdown = document.getElementById('notificationsDropdown'); if (notifDropdown && !notifDropdown.contains(e.target) && !e.target.closest('.header-btn')) notifDropdown.classList.remove('show'); });
+        });
+        
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value, password = document.getElementById('adminPassword').value;
+            const errorEl = document.getElementById('loginError'), btn = document.getElementById('loginBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...'; btn.disabled = true; errorEl.classList.remove('show');
+            setTimeout(() => {
+                if (email === 'miniquehairs@gmail.com' && password === 'Ominipotent440#') {
+                    currentAdmin = { name: 'Admin', email: email, role: 'Administrator' };
+                    localStorage.setItem('adminUser', JSON.stringify(currentAdmin));
+                    showDashboard(); loadAllData(); showNotification('Welcome back!', 'success');
+                } else { errorEl.textContent = 'Invalid credentials. Use miniquehairs@gmail.com / Ominipotent440#'; errorEl.classList.add('show'); }
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In'; btn.disabled = false;
+            }, 1000);
+        }
+        
+        function handleLogout() { localStorage.removeItem('adminUser'); currentAdmin = null; document.getElementById('loginScreen').classList.remove('hidden'); document.getElementById('adminDashboard').classList.remove('active'); document.getElementById('adminDropdown').classList.remove('show'); showNotification('Logged out', 'success'); }
+        function showDashboard() { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('adminDashboard').classList.add('active'); if (currentAdmin) { document.getElementById('adminName').textContent = currentAdmin.name; document.getElementById('adminAvatar').textContent = getInitials(currentAdmin.name); } }
+        
+        function toggleAdminDropdown(e) { e.stopPropagation(); const dropdown = document.getElementById('adminDropdown'); const chevron = document.getElementById('adminChevron'); dropdown.classList.toggle('show'); chevron.style.transform = dropdown.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)'; if (dropdown.classList.contains('show')) setTimeout(() => document.addEventListener('click', closeAdminDropdown), 10); }
+        function closeAdminDropdown(e) { const dropdown = document.getElementById('adminDropdown'), profile = document.getElementById('adminProfile'); if (!profile.contains(e.target)) { dropdown.classList.remove('show'); document.getElementById('adminChevron').style.transform = 'rotate(0deg)'; document.removeEventListener('click', closeAdminDropdown); } }
+        function showAdminProfile() { document.getElementById('adminDropdown').classList.remove('show'); document.getElementById('modalTitle').textContent = 'Admin Profile'; document.getElementById('modalBody').innerHTML = `<div style="text-align:center;margin-bottom:25px;"><div class="user-avatar-lg" style="margin:0 auto 15px;">${getInitials(currentAdmin?.name || 'Admin')}</div><h3 style="margin:0;">${currentAdmin?.name || 'Admin'}</h3><p style="color:var(--text-muted);">${currentAdmin?.email || ''}</p></div><div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" id="profileName" value="${currentAdmin?.name || ''}"></div>`; document.getElementById('modalActionBtn').textContent = 'Save Changes'; document.getElementById('modalActionBtn').onclick = () => { const name = document.getElementById('profileName').value; if (name && currentAdmin) { currentAdmin.name = name; localStorage.setItem('adminUser', JSON.stringify(currentAdmin)); document.getElementById('adminName').textContent = name; document.getElementById('adminAvatar').textContent = getInitials(name); showNotification('Profile updated!', 'success'); } closeModal(); }; document.getElementById('modalActionBtn').style.display = 'block'; document.getElementById('modal').classList.add('show'); }
+        
+        async function loadAllData() {
+            showLoading();
+            try { await Promise.all([loadAppointmentsFromAPI(), loadUsersFromAPI()]); services = [{id:1,name:'General Consultation',category:'General',price:5000,duration:'30 mins',status:'active'},{id:2,name:'Laboratory Tests',category:'Diagnostics',price:8000,duration:'45 mins',status:'active'},{id:3,name:'Specialized Care',category:'Specialist',price:15000,duration:'60 mins',status:'active'},{id:4,name:'Emergency Care',category:'Emergency',price:25000,duration:'Varies',status:'active'},{id:5,name:'Mental Health',category:'Wellness',price:10000,duration:'60 mins',status:'active'},{id:6,name:'Eye Care',category:'Specialist',price:12000,duration:'45 mins',status:'active'}]; payments = appointments.filter(a => a.status === 'confirmed' || a.status === 'completed').map((a, i) => ({id:'PAY'+i,reference:a.payment_reference||'TXN_'+Math.random().toString(36).substring(7).toUpperCase(),patientName:a.full_name||a.fullName,service:a.service,amount:getServicePrice(a.service),date:a.date||a.created_at?.split('T')[0],status:'success'})); updateStats(); renderRecentAppointments(); renderServicesList(); initRevenueChart(); loadNotifications(); } catch (e) { console.error('Error:', e); showNotification('Some data could not be loaded', 'warning'); }
+            hideLoading();
+        }
+        async function loadAppointmentsFromAPI() { try { const r = await fetch(API_URL+'/admin/appointments'); const d = await r.json(); if (d.success && d.data) { appointments = d.data.map(apt => ({...apt,fullName:apt.full_name,amount:getServicePrice(apt.service)})); console.log('Loaded', appointments.length, 'appointments'); } } catch (e) { appointments = []; } }
+        async function loadUsersFromAPI() { try { const r = await fetch(API_URL+'/admin/users'); const d = await r.json(); if (d.success && d.data) { users = d.data; console.log('Loaded', users.length, 'users'); } } catch (e) { users = []; } }
+        function refreshData() { showNotification('Refreshing...', 'info'); loadAllData(); }
+        function getServicePrice(s) { return {'General Consultation':5000,'Laboratory Tests':8000,'Specialized Care':15000,'Emergency Care':25000,'Mental Health':10000,'Eye Care':12000}[s] || 5000; }
+        
+        function updateStats() {
+            document.getElementById('totalAppointments').textContent = appointments.length;
+            const revenue = appointments.filter(a => a.status === 'confirmed' || a.status === 'completed').reduce((s, a) => s + (a.amount || getServicePrice(a.service)), 0);
+            document.getElementById('totalRevenue').textContent = formatCurrency(revenue);
+            const pending = appointments.filter(a => a.status === 'pending').length;
+            document.getElementById('pendingAppointments').textContent = pending;
+            document.getElementById('pendingBadge').textContent = pending;
+            document.getElementById('pendingBadge').style.display = pending > 0 ? 'block' : 'none';
+            document.getElementById('totalUsers').textContent = users.length;
+            const today = new Date().toISOString().split('T')[0];
+            const todayP = payments.filter(p => p.date === today);
+            if (document.getElementById('todayRevenue')) { document.getElementById('todayRevenue').textContent = formatCurrency(todayP.reduce((s, p) => s + p.amount, 0)); document.getElementById('todayTransactions').textContent = todayP.length; }
+            const thisMonth = new Date().toISOString().slice(0, 7);
+            const monthP = payments.filter(p => p.date?.startsWith(thisMonth));
+            if (document.getElementById('monthlyRevenue')) document.getElementById('monthlyRevenue').textContent = formatCurrency(monthP.reduce((s, p) => s + p.amount, 0));
+        }
+        
+        function renderRecentAppointments() {
+            const tbody = document.getElementById('recentAppointmentsTable');
+            const recent = appointments.slice(0, 5);
+            if (recent.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-calendar-times" style="font-size:2rem;margin-bottom:10px;display:block;"></i>No appointments yet</td></tr>'; return; }
+            tbody.innerHTML = recent.map(apt => { const n = apt.full_name || apt.fullName || 'Unknown'; return `<tr><td><div class="patient-info"><div class="patient-avatar">${getInitials(n)}</div><div><div class="patient-name">${n}</div><div class="patient-email">${apt.email||''}</div></div></div></td><td>${apt.service}</td><td>${formatDate(apt.date)} at ${apt.time}</td><td><span class="status-badge ${apt.status}">${apt.status}</span></td><td><div class="action-btns"><button class="action-btn view" onclick="viewAppointment('${apt.id}')"><i class="fas fa-eye"></i></button>${apt.status==='pending'?`<button class="action-btn approve" onclick="updateStatus('${apt.id}','confirmed')"><i class="fas fa-check"></i></button><button class="action-btn cancel" onclick="updateStatus('${apt.id}','cancelled')"><i class="fas fa-times"></i></button>`:''}</div></td></tr>`; }).join('');
+        }
+        
+        function renderAllAppointments() {
+            const tbody = document.getElementById('allAppointmentsTable');
+            const filter = document.getElementById('statusFilter').value;
+            let filtered = filter ? appointments.filter(a => a.status === filter) : appointments;
+            if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">No appointments found</td></tr>'; return; }
+            tbody.innerHTML = filtered.map(apt => { const n = apt.full_name || apt.fullName || 'Unknown'; const amt = apt.amount || getServicePrice(apt.service); return `<tr><td><div class="patient-info"><div class="patient-avatar">${getInitials(n)}</div><div><div class="patient-name">${n}</div><div class="patient-email">${apt.email||''}</div></div></div></td><td>${apt.service}</td><td>${formatDate(apt.date)}</td><td>${apt.time}</td><td><span class="status-badge ${apt.status}">${apt.status}</span></td><td style="color:var(--accent);font-weight:600;">${formatCurrency(amt)}</td><td><div class="action-btns"><button class="action-btn view" onclick="viewAppointment('${apt.id}')"><i class="fas fa-eye"></i></button>${apt.status==='pending'?`<button class="action-btn approve" onclick="updateStatus('${apt.id}','confirmed')"><i class="fas fa-check"></i></button><button class="action-btn cancel" onclick="updateStatus('${apt.id}','cancelled')"><i class="fas fa-times"></i></button>`:''}</div></td></tr>`; }).join('');
+        }
+        
+        function renderUsers() {
+            const grid = document.getElementById('usersGrid');
+            if (users.length === 0) { grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-users"></i><h3>No Users Yet</h3><p>Users will appear here after they register.</p></div>`; return; }
+            grid.innerHTML = users.map(user => {
+                const n = user.name || user.email?.split('@')[0] || 'User';
+                const userApts = appointments.filter(a => a.email === user.email);
+                const spent = userApts.reduce((s, a) => s + (a.amount || getServicePrice(a.service)), 0);
+                return `<div class="user-card"><div class="user-avatar-lg">${getInitials(n)}</div><h4>${n}</h4><p>${user.email}</p><p class="user-phone">${user.phone||'No phone'}</p><span class="user-role">${user.role||'User'}</span><div class="user-stats"><div class="user-stat"><div class="user-stat-value">${userApts.length}</div><div class="user-stat-label">Appointments</div></div><div class="user-stat"><div class="user-stat-value">${formatCurrency(spent)}</div><div class="user-stat-label">Total Spent</div></div></div><div class="user-actions"><button class="btn btn-secondary" onclick="viewUserDetails('${user.id}')">View</button><button class="btn btn-primary" onclick="emailUser('${user.email}')">Email</button></div></div>`;
+            }).join('');
+        }
+        
+        function renderPayments() { const tbody = document.getElementById('paymentsTable'); if (payments.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No payments found</td></tr>'; return; } tbody.innerHTML = payments.map(p => `<tr><td><code style="background:var(--bg-input);padding:4px 10px;border-radius:5px;">${p.reference}</code></td><td>${p.patientName}</td><td>${p.service}</td><td style="color:var(--accent);font-weight:600;">${formatCurrency(p.amount)}</td><td>${formatDate(p.date)}</td><td><span class="status-badge confirmed">Success</span></td></tr>`).join(''); }
+        function renderServices() { const tbody = document.getElementById('servicesTable'); tbody.innerHTML = services.map(s => `<tr><td><strong>${s.name}</strong></td><td>${s.category}</td><td style="color:var(--accent);font-weight:600;">${formatCurrency(s.price)}</td><td>${s.duration}</td><td><span class="status-badge confirmed">Active</span></td><td><div class="action-btns"><button class="action-btn view" onclick="editService(${s.id})"><i class="fas fa-edit"></i></button><button class="action-btn cancel" onclick="deleteService(${s.id})"><i class="fas fa-trash"></i></button></div></td></tr>`).join(''); }
+        function renderServicesList() { const c = document.getElementById('servicesList'); const colors = ['#10b981','#3b82f6','#f59e0b','#ef4444','#8b5cf6']; const sc = {}; appointments.forEach(a => { sc[a.service] = (sc[a.service] || 0) + 1; }); const sorted = Object.entries(sc).sort((a, b) => b[1] - a[1]).slice(0, 5); const total = appointments.length || 1; if (sorted.length === 0) { c.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px;">No data yet</p>'; return; } c.innerHTML = sorted.map(([name, count], i) => `<div class="service-item"><div class="service-color" style="background:${colors[i]}"></div><div class="service-info"><div class="service-name">${name}</div><div class="service-count">${count} appointments</div></div><div class="service-percentage">${Math.round(count/total*100)}%</div></div>`).join(''); }
+        
+        function initRevenueChart() { const ctx = document.getElementById('revenueChart'); if (!ctx) return; if (revenueChart) revenueChart.destroy(); const wd = calcWeeklyRevenue(); revenueChart = new Chart(ctx, {type:'line',data:{labels:wd.labels,datasets:[{label:'Revenue',data:wd.data,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.1)',borderWidth:3,fill:true,tension:0.4,pointBackgroundColor:'#10b981',pointBorderColor:'#fff',pointBorderWidth:2,pointRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748b',callback:v=>'₦'+v.toLocaleString()}},x:{grid:{display:false},ticks:{color:'#64748b'}}}}}); }
+        function calcWeeklyRevenue() { const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']; const today=new Date(); const labels=[],data=[]; for(let i=6;i>=0;i--){ const d=new Date(today); d.setDate(d.getDate()-i); const ds=d.toISOString().split('T')[0]; labels.push(days[d.getDay()]); data.push(appointments.filter(a=>a.date===ds&&(a.status==='confirmed'||a.status==='completed')).reduce((s,a)=>s+(a.amount||getServicePrice(a.service)),0)); } return {labels,data}; }
+        function updateChart(range) { document.querySelectorAll('.chart-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); const data={week:calcWeeklyRevenue(),month:{labels:['Week 1','Week 2','Week 3','Week 4'],data:[85000,92000,78000,105000]},year:{labels:['Jan','Feb','Mar','Apr','May','Jun'],data:[320000,380000,290000,420000,510000,480000]}}; if(revenueChart){revenueChart.data.labels=data[range].labels;revenueChart.data.datasets[0].data=data[range].data;revenueChart.update();} }
+        function initReportCharts() { const ac=document.getElementById('appointmentsChart'); if(ac)new Chart(ac,{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{data:[45,52,38,65,72,58],backgroundColor:'rgba(16,185,129,0.8)',borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748b'}},x:{grid:{display:false},ticks:{color:'#64748b'}}}}}); const sc=document.getElementById('serviceRevenueChart'); if(sc)new Chart(sc,{type:'doughnut',data:{labels:services.map(s=>s.name),datasets:[{data:[35000,48000,72000,25000,38000,22000],backgroundColor:['#10b981','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#ec4899'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',padding:15}}}}}); }
+        
+        function showPage(pageName) { document.querySelectorAll('.nav-item').forEach(item=>{item.classList.toggle('active',item.dataset.page===pageName);}); const titles={dashboard:'Dashboard',appointments:'Appointments',users:'Users',payments:'Payments',services:'Services',reports:'Reports',settings:'Settings'}; document.getElementById('pageTitle').textContent=titles[pageName]||'Dashboard'; document.querySelectorAll('.page-section').forEach(s=>{s.classList.remove('active');}); document.getElementById(pageName+'Page').classList.add('active'); switch(pageName){case'appointments':renderAllAppointments();break;case'users':renderUsers();break;case'payments':renderPayments();break;case'services':renderServices();break;case'reports':setTimeout(initReportCharts,100);break;case'settings':showSettingsTab('business');break;} document.getElementById('adminDropdown').classList.remove('show'); }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        
+        function viewAppointment(id) { const apt=appointments.find(a=>a.id===id); if(!apt)return; const n=apt.full_name||apt.fullName||'Unknown'; const amt=apt.amount||getServicePrice(apt.service); document.getElementById('modalTitle').textContent='Appointment Details'; document.getElementById('modalBody').innerHTML=`<div style="display:flex;align-items:center;gap:15px;margin-bottom:25px;"><div class="patient-avatar" style="width:60px;height:60px;font-size:20px;">${getInitials(n)}</div><div><h3 style="margin:0;">${n}</h3><p style="margin:5px 0 0;color:var(--text-muted);">${apt.email}</p></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;"><div><label style="color:var(--text-muted);font-size:0.85rem;">Phone</label><p style="margin:5px 0 0;">${apt.phone||'N/A'}</p></div><div><label style="color:var(--text-muted);font-size:0.85rem;">Service</label><p style="margin:5px 0 0;">${apt.service}</p></div><div><label style="color:var(--text-muted);font-size:0.85rem;">Date</label><p style="margin:5px 0 0;">${formatDate(apt.date)}</p></div><div><label style="color:var(--text-muted);font-size:0.85rem;">Time</label><p style="margin:5px 0 0;">${apt.time}</p></div><div><label style="color:var(--text-muted);font-size:0.85rem;">Amount</label><p style="margin:5px 0 0;color:var(--accent);font-weight:600;">${formatCurrency(amt)}</p></div><div><label style="color:var(--text-muted);font-size:0.85rem;">Status</label><p style="margin:5px 0 0;"><span class="status-badge ${apt.status}">${apt.status}</span></p></div></div>`; const ab=document.getElementById('modalActionBtn'); if(apt.status==='pending'){ab.textContent='Confirm';ab.onclick=()=>{updateStatus(apt.id,'confirmed');closeModal();};ab.style.display='block';}else{ab.style.display='none';} document.getElementById('modal').classList.add('show'); }
+        async function updateStatus(id,status) { showLoading(); try{const r=await fetch(API_URL+'/appointments/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});if(r.ok){const apt=appointments.find(a=>a.id===id);if(apt)apt.status=status;updateStats();renderRecentAppointments();renderAllAppointments();showNotification('Appointment '+status+'!','success');}else throw new Error();}catch(e){const apt=appointments.find(a=>a.id===id);if(apt)apt.status=status;updateStats();renderRecentAppointments();renderAllAppointments();showNotification('Appointment '+status+'!','success');} hideLoading(); }
+        function filterAppointments() { renderAllAppointments(); }
+        
+        function viewUserDetails(id) { const user=users.find(u=>u.id===id); if(!user)return; const n=user.name||user.email?.split('@')[0]||'User'; const userApts=appointments.filter(a=>a.email===user.email); const spent=userApts.reduce((s,a)=>s+(a.amount||getServicePrice(a.service)),0); document.getElementById('modalTitle').textContent='User Details'; document.getElementById('modalBody').innerHTML=`<div style="text-align:center;margin-bottom:25px;"><div class="user-avatar-lg" style="margin:0 auto 15px;">${getInitials(n)}</div><h3 style="margin:0;">${n}</h3><p style="color:var(--text-muted);">${user.email}</p><p style="color:var(--text-secondary);font-size:0.9rem;">${user.phone||'No phone'}</p></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;text-align:center;"><div style="background:var(--bg-input);padding:20px;border-radius:12px;"><div style="font-size:1.5rem;font-weight:700;color:var(--accent);">${userApts.length}</div><div style="color:var(--text-muted);font-size:0.85rem;">Appointments</div></div><div style="background:var(--bg-input);padding:20px;border-radius:12px;"><div style="font-size:1.5rem;font-weight:700;color:var(--accent);">${formatCurrency(spent)}</div><div style="color:var(--text-muted);font-size:0.85rem;">Total Spent</div></div></div>`; document.getElementById('modalActionBtn').style.display='none'; document.getElementById('modal').classList.add('show'); }
+        function emailUser(email) { window.location.href='mailto:'+email; showNotification('Opening email...','info'); }
+        
+        function editService(id) { const s=services.find(x=>x.id===id); if(!s)return; document.getElementById('modalTitle').textContent='Edit Service'; document.getElementById('modalBody').innerHTML=`<div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="editServiceName" value="${s.name}"></div><div class="form-group"><label class="form-label">Category</label><input type="text" class="form-input" id="editServiceCategory" value="${s.category}"></div><div class="form-group"><label class="form-label">Price (₦)</label><input type="number" class="form-input" id="editServicePrice" value="${s.price}"></div><div class="form-group"><label class="form-label">Duration</label><input type="text" class="form-input" id="editServiceDuration" value="${s.duration}"></div>`; const ab=document.getElementById('modalActionBtn'); ab.textContent='Save'; ab.onclick=()=>{s.name=document.getElementById('editServiceName').value;s.category=document.getElementById('editServiceCategory').value;s.price=parseInt(document.getElementById('editServicePrice').value);s.duration=document.getElementById('editServiceDuration').value;renderServices();closeModal();showNotification('Service updated!','success');}; ab.style.display='block'; document.getElementById('modal').classList.add('show'); }
+        function deleteService(id) { if(confirm('Delete this service?')){services=services.filter(s=>s.id!==id);renderServices();showNotification('Service deleted!','success');} }
+        function showAddServiceModal() { document.getElementById('modalTitle').textContent='Add Service'; document.getElementById('modalBody').innerHTML=`<div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="newServiceName" placeholder="Enter name"></div><div class="form-group"><label class="form-label">Category</label><input type="text" class="form-input" id="newServiceCategory" placeholder="Enter category"></div><div class="form-group"><label class="form-label">Price (₦)</label><input type="number" class="form-input" id="newServicePrice" placeholder="Enter price"></div><div class="form-group"><label class="form-label">Duration</label><input type="text" class="form-input" id="newServiceDuration" placeholder="e.g. 30 mins"></div>`; const ab=document.getElementById('modalActionBtn'); ab.textContent='Add'; ab.onclick=()=>{services.push({id:services.length+1,name:document.getElementById('newServiceName').value,category:document.getElementById('newServiceCategory').value,price:parseInt(document.getElementById('newServicePrice').value),duration:document.getElementById('newServiceDuration').value,status:'active'});renderServices();closeModal();showNotification('Service added!','success');}; ab.style.display='block'; document.getElementById('modal').classList.add('show'); }
+        function exportData() { const csv=[['ID','Patient','Email','Phone','Service','Date','Time','Status','Amount'],...appointments.map(a=>[a.id,a.full_name||a.fullName,a.email,a.phone,a.service,a.date,a.time,a.status,a.amount||getServicePrice(a.service)])].map(r=>r.join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='appointments-'+new Date().toISOString().split('T')[0]+'.csv'; a.click(); showNotification('Exported!','success'); }
+        
+        function showSettingsTab(tab) { document.querySelectorAll('.settings-nav-item').forEach(i=>i.classList.remove('active')); if(event&&event.target)event.target.classList.add('active'); const c=document.getElementById('settingsContent'); const tabs={business:`<div class="settings-section"><h3>Business Information</h3><div class="form-row"><div class="form-group"><label class="form-label">Business Name</label><input type="text" class="form-input" id="businessName" value="P&A Institute of Integrative Medicine"></div><div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="businessEmail" value="miniquehairs@gmail.com"></div></div><div class="form-row"><div class="form-group"><label class="form-label">Phone</label><input type="tel" class="form-input" id="businessPhone" value="+234 905 5066 381"></div><div class="form-group"><label class="form-label">Address</label><input type="text" class="form-input" id="businessAddress" value="No 8 Animashaun Cl, Lagos"></div></div><button class="filter-btn btn-primary" onclick="saveBusinessSettings()"><i class="fas fa-save"></i> Save</button></div>`,email:`<div class="settings-section"><h3>Email Settings</h3><div class="form-row"><div class="form-group"><label class="form-label">SMTP Host</label><input type="text" class="form-input" id="smtpHost" value="smtp.gmail.com"></div><div class="form-group"><label class="form-label">SMTP Port</label><input type="text" class="form-input" id="smtpPort" value="465"></div></div><div class="form-row"><div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="smtpEmail" value="miniquehairs@gmail.com"></div><div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="smtpPassword" placeholder="••••••••"></div></div><div style="display:flex;gap:10px;"><button class="filter-btn btn-primary" onclick="saveEmailSettings()"><i class="fas fa-save"></i> Save</button><button class="filter-btn" onclick="testEmail()"><i class="fas fa-paper-plane"></i> Test</button></div></div>`,payment:`<div class="settings-section"><h3>Payment Settings</h3><div class="form-row single"><div class="form-group"><label class="form-label">Gateway</label><select class="form-input" id="paymentGateway"><option value="paystack" selected>Paystack</option><option value="flutterwave">Flutterwave</option></select></div></div><div class="form-row"><div class="form-group"><label class="form-label">Public Key</label><input type="text" class="form-input" id="paystackPublic" placeholder="pk_test_xxx"></div><div class="form-group"><label class="form-label">Secret Key</label><input type="password" class="form-input" id="paystackSecret" placeholder="sk_test_xxx"></div></div><button class="filter-btn btn-primary" onclick="savePaymentSettings()"><i class="fas fa-save"></i> Save</button></div>`,security:`<div class="settings-section"><h3>Change Password</h3><div class="form-row single"><div class="form-group"><label class="form-label">Current Password</label><input type="password" class="form-input" id="currentPassword" placeholder="Current"></div></div><div class="form-row"><div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input" id="newPassword" placeholder="New"></div><div class="form-group"><label class="form-label">Confirm</label><input type="password" class="form-input" id="confirmPassword" placeholder="Confirm"></div></div><button class="filter-btn btn-primary" onclick="changePassword()"><i class="fas fa-key"></i> Update</button><h3 style="margin-top:40px;">Session</h3><div style="background:var(--bg-input);padding:20px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;"><div><p style="margin:0;font-weight:600;">Current Session</p><p style="margin:5px 0 0;color:var(--text-muted);font-size:0.85rem;">Logged in as ${currentAdmin?.email||'admin'}</p></div><button class="filter-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button></div></div>`}; c.innerHTML=tabs[tab]||tabs.business; }
+        function saveBusinessSettings() { localStorage.setItem('businessSettings',JSON.stringify({name:document.getElementById('businessName')?.value,email:document.getElementById('businessEmail')?.value,phone:document.getElementById('businessPhone')?.value,address:document.getElementById('businessAddress')?.value})); showNotification('Business settings saved!','success'); }
+        function saveEmailSettings() { localStorage.setItem('emailSettings',JSON.stringify({host:document.getElementById('smtpHost')?.value,port:document.getElementById('smtpPort')?.value,email:document.getElementById('smtpEmail')?.value,password:document.getElementById('smtpPassword')?.value})); showNotification('Email settings saved!','success'); }
+        async function testEmail() { showNotification('Testing email...','info'); try{const r=await fetch(API_URL+'/test-email');const d=await r.json();if(d.success)showNotification('Email works!','success');else showNotification('Email test failed','error');}catch(e){showNotification('Could not test email','warning');} }
+        function savePaymentSettings() { localStorage.setItem('paymentSettings',JSON.stringify({gateway:document.getElementById('paymentGateway')?.value,publicKey:document.getElementById('paystackPublic')?.value,secretKey:document.getElementById('paystackSecret')?.value})); showNotification('Payment settings saved!','success'); }
+        function changePassword() { const np=document.getElementById('newPassword')?.value; const cp=document.getElementById('confirmPassword')?.value; if(!np||!cp){showNotification('Fill all fields','error');return;} if(np!==cp){showNotification('Passwords do not match','error');return;} if(np.length<8){showNotification('Password must be 8+ characters','error');return;} showNotification('Password updated!','success'); document.getElementById('currentPassword').value=''; document.getElementById('newPassword').value=''; document.getElementById('confirmPassword').value=''; }
+        
+        function loadNotifications() { const n=[{icon:'fa-calendar-check',color:'#3b82f6',title:'New Appointment',text:'Check recent appointments',time:'5 mins ago',unread:true},{icon:'fa-credit-card',color:'#10b981',title:'Payment Received',text:'New payment processed',time:'1 hour ago',unread:true},{icon:'fa-user-plus',color:'#8b5cf6',title:'New User',text:'A new user registered',time:'3 hours ago',unread:true}]; document.getElementById('notifList').innerHTML=n.map(x=>`<div class="notif-item ${x.unread?'unread':''}"><div class="notif-icon" style="background:${x.color}20;color:${x.color};"><i class="fas ${x.icon}"></i></div><div class="notif-content"><div class="notif-title">${x.title}</div><div class="notif-text">${x.text}</div><div class="notif-time">${x.time}</div></div></div>`).join(''); document.getElementById('notifBadge').textContent=n.filter(x=>x.unread).length; }
+        function toggleNotifications() { document.getElementById('notificationsDropdown').classList.toggle('show'); }
+        function clearNotifications() { document.getElementById('notifList').innerHTML='<p style="padding:30px;text-align:center;color:var(--text-muted);">No notifications</p>'; document.getElementById('notifBadge').textContent='0'; }
+        
+        function getInitials(n) { if(!n)return'U'; const p=n.trim().split(' '); return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():n.substring(0,2).toUpperCase(); }
+        function formatCurrency(a) { return '₦'+(a||0).toLocaleString(); }
+        function formatDate(d) { if(!d)return'N/A'; return new Date(d).toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric'}); }
+        function showNotification(msg,type='success') { const n=document.getElementById('notification'); const i=document.getElementById('notifIcon'); document.getElementById('notificationText').textContent=msg; n.className='notification '+type; i.className='fas '+{success:'fa-check-circle',error:'fa-exclamation-circle',warning:'fa-exclamation-triangle',info:'fa-info-circle'}[type]; n.classList.add('show'); setTimeout(()=>n.classList.remove('show'),3000); }
+        function closeModal() { document.getElementById('modal').classList.remove('show'); }
+        function showLoading() { document.getElementById('loadingOverlay').classList.remove('hidden'); }
+        function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
+    </script>
+</body>
+</html>

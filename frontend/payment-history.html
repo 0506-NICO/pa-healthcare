@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment History - P&A Institute</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary:#10b981; --primary-dark:#059669; --accent:#3dd9a4; --bg:#0f172a; --bg-card:#1e293b; --bg-input:#334155; --text:#f1f5f9; --text-muted:#64748b; --border:rgba(255,255,255,0.1); --success:#10b981; --warning:#f59e0b; --danger:#ef4444; --info:#3b82f6; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+        .navbar { background:var(--bg-card); padding:15px 0; border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
+        .nav-container { max-width:1200px; margin:0 auto; padding:0 20px; display:flex; align-items:center; justify-content:space-between; }
+        .logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text); }
+        .logo-icon { width:40px; height:40px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+        .logo-text { font-weight:700; font-size:1.1rem; }
+        .nav-links { display:flex; align-items:center; gap:20px; }
+        .nav-link { color:var(--text-muted); text-decoration:none; font-size:0.9rem; transition:color 0.2s; }
+        .nav-link:hover { color:var(--primary); }
+        .container { max-width:1000px; margin:0 auto; padding:40px 20px; }
+        .page-header { margin-bottom:30px; }
+        .page-title { font-size:1.8rem; font-weight:700; margin-bottom:10px; }
+        .page-subtitle { color:var(--text-muted); }
+        .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:30px; }
+        .stat-card { background:var(--bg-card); border-radius:16px; padding:25px; border:1px solid var(--border); text-align:center; }
+        .stat-icon { width:50px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; font-size:20px; }
+        .stat-icon.green { background:rgba(16,185,129,0.15); color:var(--success); }
+        .stat-icon.blue { background:rgba(59,130,246,0.15); color:var(--info); }
+        .stat-icon.yellow { background:rgba(245,158,11,0.15); color:var(--warning); }
+        .stat-value { font-size:1.5rem; font-weight:700; margin-bottom:5px; }
+        .stat-label { color:var(--text-muted); font-size:0.85rem; }
+        .filters { display:flex; gap:15px; margin-bottom:25px; flex-wrap:wrap; }
+        .filter-group { display:flex; align-items:center; gap:10px; }
+        .filter-label { color:var(--text-muted); font-size:0.85rem; }
+        .filter-input { padding:10px 15px; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:0.9rem; }
+        .filter-input:focus { outline:none; border-color:var(--primary); }
+        .card { background:var(--bg-card); border-radius:16px; border:1px solid var(--border); overflow:hidden; }
+        .card-header { padding:20px 25px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; }
+        .card-title { font-size:1.1rem; font-weight:600; }
+        .card-body { padding:0; }
+        .table-wrapper { overflow-x:auto; }
+        table { width:100%; border-collapse:collapse; }
+        th,td { padding:15px 20px; text-align:left; border-bottom:1px solid var(--border); }
+        th { font-size:0.8rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); font-weight:600; background:var(--bg-input); }
+        tr:hover { background:rgba(255,255,255,0.02); }
+        .reference { font-family:monospace; background:var(--bg-input); padding:4px 10px; border-radius:5px; font-size:0.85rem; }
+        .amount { color:var(--accent); font-weight:600; }
+        .status-badge { display:inline-block; padding:5px 12px; border-radius:20px; font-size:0.75rem; font-weight:500; }
+        .status-badge.success { background:rgba(16,185,129,0.15); color:var(--success); }
+        .status-badge.pending { background:rgba(245,158,11,0.15); color:var(--warning); }
+        .status-badge.failed { background:rgba(239,68,68,0.15); color:var(--danger); }
+        .btn { padding:8px 16px; border-radius:8px; font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.2s; border:none; display:inline-flex; align-items:center; gap:6px; text-decoration:none; }
+        .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
+        .btn-outline:hover { border-color:var(--primary); color:var(--primary); }
+        .btn-primary { background:var(--primary); color:white; }
+        .btn-primary:hover { background:var(--primary-dark); }
+        .empty-state { text-align:center; padding:60px 20px; }
+        .empty-icon { font-size:4rem; color:var(--text-muted); margin-bottom:20px; opacity:0.5; }
+        .empty-title { font-size:1.3rem; font-weight:600; margin-bottom:10px; }
+        .empty-text { color:var(--text-muted); margin-bottom:25px; }
+        .loading { text-align:center; padding:40px; color:var(--text-muted); }
+        .spinner { width:40px; height:40px; border:3px solid var(--bg-input); border-top-color:var(--primary); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 15px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        @media (max-width:768px) { .stats-row { grid-template-columns:1fr; } .filters { flex-direction:column; } th,td { padding:12px 15px; font-size:0.85rem; } .nav-links { display:none; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo"><div class="logo-icon">🏥</div><span class="logo-text">P&A Institute</span></a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="my-appointments.html" class="nav-link">My Appointments</a>
+                <a href="my-profile.html" class="nav-link">My Profile</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Payment History</h1>
+            <p class="page-subtitle">View all your transactions and payment records</p>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fas fa-naira-sign"></i></div>
+                <div class="stat-value" id="totalSpent">₦0</div>
+                <div class="stat-label">Total Spent</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fas fa-receipt"></i></div>
+                <div class="stat-value" id="totalTransactions">0</div>
+                <div class="stat-label">Transactions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon yellow"><i class="fas fa-calendar"></i></div>
+                <div class="stat-value" id="lastPayment">-</div>
+                <div class="stat-label">Last Payment</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label class="filter-label">From:</label>
+                <input type="date" class="filter-input" id="dateFrom">
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">To:</label>
+                <input type="date" class="filter-input" id="dateTo">
+            </div>
+            <button class="btn btn-primary" onclick="applyFilters()"><i class="fas fa-filter"></i> Filter</button>
+            <button class="btn btn-outline" onclick="clearFilters()"><i class="fas fa-times"></i> Clear</button>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Transaction History</h3>
+                <button class="btn btn-outline" onclick="exportPayments()"><i class="fas fa-download"></i> Export</button>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Reference</th>
+                                <th>Service</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsTable">
+                            <tr><td colspan="6"><div class="loading"><div class="spinner"></div>Loading payments...</div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5002/api';
+        let payments = [];
+        let filteredPayments = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadPayments();
+        });
+
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (!user || !user.loggedIn) { 
+                alert('Please login first');
+                window.location.href = 'index.html'; 
+                return; 
+            }
+        }
+
+        async function loadPayments() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            
+            try {
+                // Get appointments for this user and derive payments from confirmed/completed
+                const response = await fetch(`${API_URL}/admin/appointments`);
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    const userAppointments = data.data.filter(apt => apt.email === user.email);
+                    payments = userAppointments
+                        .filter(apt => apt.status === 'confirmed' || apt.status === 'completed')
+                        .map((apt, index) => ({
+                            id: 'PAY_' + (apt.id || index),
+                            reference: apt.payment_reference || 'TXN_' + Math.random().toString(36).substring(2, 10).toUpperCase(),
+                            service: apt.service,
+                            amount: getServicePrice(apt.service),
+                            date: apt.date || apt.created_at?.split('T')[0],
+                            status: 'success',
+                            appointmentId: apt.id
+                        }));
+                }
+            } catch (error) {
+                console.error('Error loading payments:', error);
+                payments = [];
+            }
+            
+            filteredPayments = [...payments];
+            updateStats();
+            renderPayments();
+        }
+
+        function updateStats() {
+            const totalSpent = filteredPayments.reduce((sum, p) => sum + p.amount, 0);
+            document.getElementById('totalSpent').textContent = formatCurrency(totalSpent);
+            document.getElementById('totalTransactions').textContent = filteredPayments.length;
+            
+            if (filteredPayments.length > 0) {
+                const sorted = [...filteredPayments].sort((a, b) => new Date(b.date) - new Date(a.date));
+                document.getElementById('lastPayment').textContent = formatDateShort(sorted[0].date);
+            } else {
+                document.getElementById('lastPayment').textContent = '-';
+            }
+        }
+
+        function renderPayments() {
+            const tbody = document.getElementById('paymentsTable');
+            
+            if (filteredPayments.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="fas fa-receipt"></i></div>
+                                <h3 class="empty-title">No Payments Found</h3>
+                                <p class="empty-text">You haven't made any payments yet.</p>
+                                <a href="index.html#booking" class="btn btn-primary"><i class="fas fa-calendar-plus"></i> Book Appointment</a>
+                            </div>
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filteredPayments.map(p => `
+                <tr>
+                    <td><span class="reference">${p.reference}</span></td>
+                    <td>${p.service}</td>
+                    <td class="amount">${formatCurrency(p.amount)}</td>
+                    <td>${formatDate(p.date)}</td>
+                    <td><span class="status-badge ${p.status}">${p.status}</span></td>
+                    <td><button class="btn btn-outline" onclick="downloadReceipt('${p.id}')"><i class="fas fa-download"></i></button></td>
+                </tr>
+            `).join('');
+        }
+
+        function applyFilters() {
+            const from = document.getElementById('dateFrom').value;
+            const to = document.getElementById('dateTo').value;
+            
+            filteredPayments = payments.filter(p => {
+                const date = new Date(p.date);
+                if (from && date < new Date(from)) return false;
+                if (to && date > new Date(to)) return false;
+                return true;
+            });
+            
+            updateStats();
+            renderPayments();
+        }
+
+        function clearFilters() {
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            filteredPayments = [...payments];
+            updateStats();
+            renderPayments();
+        }
+
+        function downloadReceipt(paymentId) {
+            const payment = payments.find(p => p.id === paymentId);
+            if (!payment) return;
+            
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const receiptContent = `
+P&A INSTITUTE OF INTEGRATIVE MEDICINE
+=====================================
+PAYMENT RECEIPT
+
+Reference: ${payment.reference}
+Date: ${formatDate(payment.date)}
+
+Patient: ${user.name || user.email}
+Email: ${user.email}
+
+Service: ${payment.service}
+Amount: ${formatCurrency(payment.amount)}
+
+Status: PAID
+
+Thank you for choosing P&A Institute!
+Contact: +234 905 5066 381
+Address: No 8 Animashaun Cl, Lagos
+=====================================
+            `;
+            
+            const blob = new Blob([receiptContent], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `receipt-${payment.reference}.txt`;
+            a.click();
+        }
+
+        function exportPayments() {
+            if (filteredPayments.length === 0) { alert('No payments to export'); return; }
+            
+            const csv = [
+                ['Reference', 'Service', 'Amount', 'Date', 'Status'],
+                ...filteredPayments.map(p => [p.reference, p.service, p.amount, p.date, p.status])
+            ].map(row => row.join(',')).join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `payment-history-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
+        function formatCurrency(amount) { return '₦' + (amount || 0).toLocaleString(); }
+        function formatDate(dateStr) { if (!dateStr) return 'N/A'; return new Date(dateStr).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }); }
+        function formatDateShort(dateStr) { if (!dateStr) return '-'; return new Date(dateStr).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' }); }
+        function getServicePrice(service) { return { 'General Consultation': 5000, 'Laboratory Tests': 8000, 'Specialized Care': 15000, 'Emergency Care': 25000, 'Mental Health': 10000, 'Eye Care': 12000 }[service] || 5000; }
+    </script>
+</body>
+</html>

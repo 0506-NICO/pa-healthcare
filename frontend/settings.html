@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - P&A Institute</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary:#10b981; --primary-dark:#059669; --accent:#3dd9a4; --bg:#0f172a; --bg-card:#1e293b; --bg-input:#334155; --text:#f1f5f9; --text-muted:#64748b; --border:rgba(255,255,255,0.1); --success:#10b981; --warning:#f59e0b; --danger:#ef4444; --info:#3b82f6; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+        .navbar { background:var(--bg-card); padding:15px 0; border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
+        .nav-container { max-width:1200px; margin:0 auto; padding:0 20px; display:flex; align-items:center; justify-content:space-between; }
+        .logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text); }
+        .logo-icon { width:40px; height:40px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+        .logo-text { font-weight:700; font-size:1.1rem; }
+        .nav-links { display:flex; align-items:center; gap:20px; }
+        .nav-link { color:var(--text-muted); text-decoration:none; font-size:0.9rem; transition:color 0.2s; }
+        .nav-link:hover { color:var(--primary); }
+        .container { max-width:900px; margin:0 auto; padding:40px 20px; }
+        .page-header { margin-bottom:30px; }
+        .page-title { font-size:1.8rem; font-weight:700; margin-bottom:10px; }
+        .page-subtitle { color:var(--text-muted); }
+        .settings-layout { display:grid; grid-template-columns:220px 1fr; gap:30px; }
+        .settings-nav { background:var(--bg-card); border-radius:16px; padding:15px; border:1px solid var(--border); height:fit-content; position:sticky; top:100px; }
+        .nav-item { display:flex; align-items:center; gap:12px; padding:12px 15px; border-radius:10px; color:var(--text-muted); cursor:pointer; transition:all 0.2s; margin-bottom:5px; }
+        .nav-item:hover,.nav-item.active { background:var(--primary); color:white; }
+        .nav-item i { width:18px; }
+        .settings-content { background:var(--bg-card); border-radius:16px; padding:30px; border:1px solid var(--border); }
+        .settings-section { display:none; }
+        .settings-section.active { display:block; }
+        .section-title { font-size:1.2rem; font-weight:600; margin-bottom:25px; padding-bottom:15px; border-bottom:1px solid var(--border); }
+        .form-group { margin-bottom:25px; }
+        .form-label { display:block; font-size:0.875rem; color:var(--text-muted); margin-bottom:10px; font-weight:500; }
+        .form-input { width:100%; padding:14px 16px; background:var(--bg-input); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:0.95rem; transition:border 0.2s; }
+        .form-input:focus { outline:none; border-color:var(--primary); }
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+        .toggle-group { display:flex; align-items:center; justify-content:space-between; padding:15px 0; border-bottom:1px solid var(--border); }
+        .toggle-info h4 { font-size:0.95rem; margin-bottom:5px; }
+        .toggle-info p { font-size:0.8rem; color:var(--text-muted); }
+        .toggle { width:50px; height:28px; background:var(--bg-input); border-radius:14px; position:relative; cursor:pointer; transition:background 0.3s; }
+        .toggle.active { background:var(--primary); }
+        .toggle::after { content:''; position:absolute; width:22px; height:22px; background:white; border-radius:50%; top:3px; left:3px; transition:left 0.3s; }
+        .toggle.active::after { left:25px; }
+        .btn { padding:12px 24px; border-radius:10px; font-size:0.95rem; font-weight:500; cursor:pointer; transition:all 0.2s; border:none; display:inline-flex; align-items:center; gap:8px; }
+        .btn-primary { background:var(--primary); color:white; }
+        .btn-primary:hover { background:var(--primary-dark); }
+        .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
+        .btn-outline:hover { border-color:var(--primary); color:var(--primary); }
+        .btn-danger { background:rgba(239,68,68,0.15); color:var(--danger); }
+        .btn-danger:hover { background:var(--danger); color:white; }
+        .danger-zone { margin-top:40px; padding:25px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:12px; }
+        .danger-zone h4 { color:var(--danger); margin-bottom:10px; }
+        .danger-zone p { color:var(--text-muted); font-size:0.9rem; margin-bottom:20px; }
+        .notification { position:fixed; top:20px; right:20px; background:var(--bg-card); border-radius:12px; padding:16px 20px; display:flex; align-items:center; gap:12px; box-shadow:0 10px 40px rgba(0,0,0,0.3); border-left:4px solid var(--success); z-index:10000; transform:translateX(120%); transition:transform 0.3s; }
+        .notification.show { transform:translateX(0); }
+        .notification.error { border-left-color:var(--danger); }
+        @media (max-width:768px) { .settings-layout { grid-template-columns:1fr; } .settings-nav { position:static; display:flex; overflow-x:auto; gap:5px; padding:10px; } .nav-item { white-space:nowrap; padding:10px 15px; } .form-row { grid-template-columns:1fr; } .nav-links { display:none; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo"><div class="logo-icon">🏥</div><span class="logo-text">P&A Institute</span></a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="my-appointments.html" class="nav-link">My Appointments</a>
+                <a href="my-profile.html" class="nav-link">My Profile</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Settings</h1>
+            <p class="page-subtitle">Manage your account preferences and settings</p>
+        </div>
+
+        <div class="settings-layout">
+            <div class="settings-nav">
+                <div class="nav-item active" data-section="notifications"><i class="fas fa-bell"></i> Notifications</div>
+                <div class="nav-item" data-section="privacy"><i class="fas fa-shield-alt"></i> Privacy</div>
+                <div class="nav-item" data-section="security"><i class="fas fa-lock"></i> Security</div>
+                <div class="nav-item" data-section="preferences"><i class="fas fa-sliders-h"></i> Preferences</div>
+            </div>
+
+            <div class="settings-content">
+                <!-- Notifications Section -->
+                <div class="settings-section active" id="notifications">
+                    <h3 class="section-title">Notification Settings</h3>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <h4>Email Notifications</h4>
+                            <p>Receive appointment reminders and updates via email</p>
+                        </div>
+                        <div class="toggle active" data-setting="emailNotif" onclick="toggleSetting(this)"></div>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <h4>SMS Notifications</h4>
+                            <p>Get text message reminders for upcoming appointments</p>
+                        </div>
+                        <div class="toggle active" data-setting="smsNotif" onclick="toggleSetting(this)"></div>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <h4>Marketing Emails</h4>
+                            <p>Receive newsletters and promotional offers</p>
+                        </div>
+                        <div class="toggle" data-setting="marketingEmails" onclick="toggleSetting(this)"></div>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <h4>Appointment Reminders</h4>
+                            <p>Get reminded 24 hours before your appointment</p>
+                        </div>
+                        <div class="toggle active" data-setting="appointmentReminders" onclick="toggleSetting(this)"></div>
+                    </div>
+
+                    <div style="margin-top:30px;">
+                        <button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> Save Changes</button>
+                    </div>
+                </div>
+
+                <!-- Privacy Section -->
+                <div class="settings-section" id="privacy">
+                    <h3 class="section-title">Privacy Settings</h3>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <h4>Profile Visibility</h4>
+                            <p>Allow healthcare providers to view your profile</p>
+                        </div>
+                        <div class="toggle active" data-setting="profileVisible" onclick="toggleSetting(this)"></div>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <h4>Share Medical History</h4>
+                            <p>Share your appointment history with assigned doctors</p>
+                        </div>
+                        <div class="toggle active" data-setting="shareMedical" onclick="toggleSetting(this)"></div>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <h4>Data Analytics</h4>
+                            <p>Help improve our services with anonymized data</p>
+                        </div>
+                        <div class="toggle" data-setting="dataAnalytics" onclick="toggleSetting(this)"></div>
+                    </div>
+
+                    <div style="margin-top:30px;">
+                        <button class="btn btn-outline" onclick="downloadData()"><i class="fas fa-download"></i> Download My Data</button>
+                    </div>
+
+                    <div style="margin-top:30px;">
+                        <button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> Save Changes</button>
+                    </div>
+                </div>
+
+                <!-- Security Section -->
+                <div class="settings-section" id="security">
+                    <h3 class="section-title">Security Settings</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" class="form-input" id="currentPassword" placeholder="Enter current password">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">New Password</label>
+                            <input type="password" class="form-input" id="newPassword" placeholder="Enter new password">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-input" id="confirmPassword" placeholder="Confirm new password">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="changePassword()"><i class="fas fa-key"></i> Update Password</button>
+
+                    <div class="toggle-group" style="margin-top:30px;">
+                        <div class="toggle-info">
+                            <h4>Two-Factor Authentication</h4>
+                            <p>Add an extra layer of security to your account</p>
+                        </div>
+                        <div class="toggle" data-setting="twoFactor" onclick="toggleSetting(this)"></div>
+                    </div>
+
+                    <div class="danger-zone">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Danger Zone</h4>
+                        <p>Once you delete your account, there is no going back. Please be certain.</p>
+                        <button class="btn btn-danger" onclick="deleteAccount()"><i class="fas fa-trash"></i> Delete Account</button>
+                    </div>
+                </div>
+
+                <!-- Preferences Section -->
+                <div class="settings-section" id="preferences">
+                    <h3 class="section-title">Preferences</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Language</label>
+                        <select class="form-input" id="language">
+                            <option value="en">English</option>
+                            <option value="yo">Yoruba</option>
+                            <option value="ig">Igbo</option>
+                            <option value="ha">Hausa</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Preferred Contact Method</label>
+                        <select class="form-input" id="contactMethod">
+                            <option value="email">Email</option>
+                            <option value="sms">SMS</option>
+                            <option value="whatsapp">WhatsApp</option>
+                            <option value="phone">Phone Call</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Preferred Appointment Time</label>
+                        <select class="form-input" id="preferredTime">
+                            <option value="morning">Morning (9AM - 12PM)</option>
+                            <option value="afternoon">Afternoon (12PM - 4PM)</option>
+                            <option value="evening">Evening (4PM - 6PM)</option>
+                            <option value="any">No Preference</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-top:30px;">
+                        <button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> Save Preferences</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"><i class="fas fa-check-circle" id="notifIcon"></i><span id="notifText">Success</span></div>
+
+    <script>
+        let settings = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadSettings();
+            setupNavigation();
+        });
+
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (!user || !user.loggedIn) { 
+                alert('Please login first');
+                window.location.href = 'index.html'; 
+                return; 
+            }
+        }
+
+        function loadSettings() {
+            settings = JSON.parse(localStorage.getItem('userSettings') || '{}');
+            
+            // Apply saved toggle states
+            document.querySelectorAll('.toggle').forEach(toggle => {
+                const key = toggle.dataset.setting;
+                if (settings[key] !== undefined) {
+                    toggle.classList.toggle('active', settings[key]);
+                }
+            });
+
+            // Apply saved select values
+            if (settings.language) document.getElementById('language').value = settings.language;
+            if (settings.contactMethod) document.getElementById('contactMethod').value = settings.contactMethod;
+            if (settings.preferredTime) document.getElementById('preferredTime').value = settings.preferredTime;
+        }
+
+        function setupNavigation() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+                    document.getElementById(item.dataset.section).classList.add('active');
+                });
+            });
+        }
+
+        function toggleSetting(el) {
+            el.classList.toggle('active');
+            settings[el.dataset.setting] = el.classList.contains('active');
+        }
+
+        function saveSettings() {
+            settings.language = document.getElementById('language').value;
+            settings.contactMethod = document.getElementById('contactMethod').value;
+            settings.preferredTime = document.getElementById('preferredTime').value;
+            
+            localStorage.setItem('userSettings', JSON.stringify(settings));
+            showNotification('Settings saved successfully!');
+        }
+
+        function changePassword() {
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+
+            if (!current || !newPass || !confirm) {
+                showNotification('Please fill all password fields', 'error');
+                return;
+            }
+
+            if (newPass !== confirm) {
+                showNotification('New passwords do not match', 'error');
+                return;
+            }
+
+            if (newPass.length < 8) {
+                showNotification('Password must be at least 8 characters', 'error');
+                return;
+            }
+
+            // Clear fields
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            
+            showNotification('Password updated successfully!');
+        }
+
+        function downloadData() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const data = {
+                profile: user,
+                settings: settings,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'my-data.json';
+            a.click();
+            
+            showNotification('Data downloaded successfully!');
+        }
+
+        function deleteAccount() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                if (confirm('This will permanently delete all your data. Type "DELETE" to confirm.')) {
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('userSettings');
+                    localStorage.removeItem('token');
+                    showNotification('Account deleted. Redirecting...');
+                    setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+                }
+            }
+        }
+
+        function showNotification(msg, type = 'success') {
+            const n = document.getElementById('notification');
+            const icon = document.getElementById('notifIcon');
+            document.getElementById('notifText').textContent = msg;
+            icon.className = 'fas ' + (type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle');
+            n.style.borderLeftColor = type === 'error' ? 'var(--danger)' : 'var(--success)';
+            n.classList.add('show');
+            setTimeout(() => n.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>
