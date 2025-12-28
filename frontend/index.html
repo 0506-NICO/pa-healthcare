@@ -1175,7 +1175,7 @@
                 </button>
 
                 <div class="nav-user-menu" id="navUserMenu">
-                   <button class="user-avatar-btn" onclick="toggleUserDropdown(event)" id="userAvatarBtn">
+                    <button class="user-avatar-btn" onclick="toggleUserDropdown(event)" id="userAvatarBtn">
                         <span id="userInitials">U</span>
                     </button>
 
@@ -1693,8 +1693,9 @@
         // ============================================
         // CONFIGURATION - UPDATE THESE!
         // ============================================
-        const API_URL = 'http://localhost:5002/api';  // Your backend URL
+        const API_URL = 'https://pa-healthcare-projectile.up.railway.app/api';  // Your backend URL
         const PAYSTACK_PUBLIC_KEY = 'pk_test_f84e02cb1d28923c5f283e04c6a0e9dfc3ab275c'; // Your Paystack public key
+
 
         // ============================================
         // STATE
@@ -1736,7 +1737,15 @@
                 }
             });
         }
-
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navbarNav = document.querySelector('.navbar-nav');
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', function () {
+                navbarNav.classList.toggle('mobile-open');
+                this.classList.toggle('active');
+            });
+        }
         // ============================================
         // STORAGE
         // ============================================
@@ -1937,10 +1946,10 @@
             document.getElementById('loginBtn').style.display = 'inline-flex';
         }
 
-       function toggleUserDropdown(event) {
-    event.stopPropagation();  // This prevents the click from bubbling up
-    document.getElementById('userDropdown').classList.toggle('active');
-}
+        function toggleUserDropdown(event) {
+            event.stopPropagation();  // This prevents the click from bubbling up
+            document.getElementById('userDropdown').classList.toggle('active');
+        }
 
         // ============================================
         // USER MENU
