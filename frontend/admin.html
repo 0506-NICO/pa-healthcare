@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - P&A Institute</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --secondary: #1a1a2e;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--gray-100);
+            min-height: 100vh;
+        }
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--secondary);
+            color: white;
+            padding: 20px;
+            z-index: 100;
+        }
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+        .sidebar-logo-icon { font-size: 2rem; }
+        .sidebar-logo-text { font-size: 1.2rem; font-weight: 700; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav li { margin-bottom: 5px; }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background: var(--primary);
+            color: white;
+        }
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header h1 { font-size: 1.8rem; color: var(--gray-900); }
+        .header-actions { display: flex; gap: 15px; align-items: center; }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-danger { background: var(--danger); color: white; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .stat-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+        .stat-card-icon.blue { background: #dbeafe; color: #2563eb; }
+        .stat-card-icon.green { background: #d1fae5; color: #059669; }
+        .stat-card-icon.yellow { background: #fef3c7; color: #d97706; }
+        .stat-card-icon.purple { background: #ede9fe; color: #7c3aed; }
+        .stat-card-value { font-size: 2rem; font-weight: 700; color: var(--gray-900); }
+        .stat-card-label { color: var(--gray-500); margin-top: 5px; }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        .card-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-title { font-size: 1.2rem; font-weight: 600; color: var(--gray-900); }
+        .card-body { padding: 25px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--gray-200); }
+        th { font-weight: 600; color: var(--gray-700); background: var(--gray-50); }
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .badge-success { background: #d1fae5; color: #059669; }
+        .badge-warning { background: #fef3c7; color: #d97706; }
+        .badge-danger { background: #fee2e2; color: #dc2626; }
+        .badge-info { background: #dbeafe; color: #2563eb; }
+        .action-btns { display: flex; gap: 8px; }
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .action-btn.view { background: #dbeafe; color: #2563eb; }
+        .action-btn.edit { background: #d1fae5; color: #059669; }
+        .action-btn.delete { background: #fee2e2; color: #dc2626; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab {
+            padding: 10px 20px;
+            border: none;
+            background: var(--gray-200);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .tab.active { background: var(--primary); color: white; }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray-500);
+        }
+        .loading i { font-size: 2rem; margin-bottom: 10px; }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .stats-grid { grid-template-columns: 1fr; }
+            table { font-size: 0.9rem; }
+            th, td { padding: 10px; }
+        }
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 101;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .mobile-toggle { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">🏥</div>
+            <div class="sidebar-logo-text">P&A Admin</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="#" class="active" onclick="showSection('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+            <li><a href="#" onclick="showSection('appointments')"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+            <li><a href="#" onclick="showSection('users')"><i class="fas fa-users"></i> Users</a></li>
+            <li><a href="#" onclick="showSection('payments')"><i class="fas fa-credit-card"></i> Payments</a></li>
+            <li><a href="index.html"><i class="fas fa-home"></i> Back to Site</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <!-- Dashboard Section -->
+        <div id="dashboardSection">
+            <div class="header">
+                <h1>📊 Dashboard</h1>
+                <div class="header-actions">
+                    <span id="lastUpdated">Last updated: --</span>
+                    <button class="btn btn-primary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <div class="stat-card-value" id="totalAppointments">0</div>
+                            <div class="stat-card-label">Total Appointments</div>
+                        </div>
+                        <div class="stat-card-icon blue"><i class="fas fa-calendar-check"></i></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <div class="stat-card-value" id="pendingAppointments">0</div>
+                            <div class="stat-card-label">Pending</div>
+                        </div>
+                        <div class="stat-card-icon yellow"><i class="fas fa-clock"></i></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <div class="stat-card-value" id="confirmedAppointments">0</div>
+                            <div class="stat-card-label">Confirmed</div>
+                        </div>
+                        <div class="stat-card-icon green"><i class="fas fa-check-circle"></i></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <div class="stat-card-value" id="totalUsers">0</div>
+                            <div class="stat-card-label">Total Users</div>
+                        </div>
+                        <div class="stat-card-icon purple"><i class="fas fa-users"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Recent Appointments</h3>
+                </div>
+                <div class="card-body">
+                    <div id="recentAppointmentsTable">
+                        <div class="loading"><i class="fas fa-spinner fa-spin"></i><br>Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointments Section -->
+        <div id="appointmentsSection" style="display: none;">
+            <div class="header">
+                <h1>📅 All Appointments</h1>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="tabs">
+                        <button class="tab active" onclick="filterAppointments('all')">All</button>
+                        <button class="tab" onclick="filterAppointments('pending')">Pending</button>
+                        <button class="tab" onclick="filterAppointments('confirmed')">Confirmed</button>
+                        <button class="tab" onclick="filterAppointments('cancelled')">Cancelled</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="allAppointmentsTable">
+                        <div class="loading"><i class="fas fa-spinner fa-spin"></i><br>Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Section -->
+        <div id="usersSection" style="display: none;">
+            <div class="header">
+                <h1>👥 Users</h1>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div id="usersTable">
+                        <div class="loading"><i class="fas fa-spinner fa-spin"></i><br>Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payments Section -->
+        <div id="paymentsSection" style="display: none;">
+            <div class="header">
+                <h1>💳 Payments</h1>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <div class="stat-card-value" id="totalRevenue">₦0</div>
+                            <div class="stat-card-label">Total Revenue</div>
+                        </div>
+                        <div class="stat-card-icon green"><i class="fas fa-naira-sign"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div id="paymentsTable">
+                        <div class="loading"><i class="fas fa-spinner fa-spin"></i><br>Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const API_URL = 'https://pa-healthcare-projectile.up.railway.app/api';
+
+        let allAppointments = [];
+        let allUsers = [];
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🏥 Admin Dashboard Loading...');
+            refreshData();
+        });
+
+        // ============================================
+        // DATA FETCHING
+        // ============================================
+        async function refreshData() {
+            document.getElementById('lastUpdated').textContent = 'Updating...';
+            
+            try {
+                // Fetch stats
+                const statsRes = await fetch(`${API_URL}/admin/stats`);
+                const statsData = await statsRes.json();
+                
+                if (statsData.success) {
+                    document.getElementById('totalAppointments').textContent = statsData.data.totalAppointments || 0;
+                    document.getElementById('pendingAppointments').textContent = statsData.data.pendingAppointments || 0;
+                    document.getElementById('confirmedAppointments').textContent = statsData.data.confirmedAppointments || 0;
+                    document.getElementById('totalUsers').textContent = statsData.data.totalUsers || 0;
+                    document.getElementById('totalRevenue').textContent = '₦' + (statsData.data.totalRevenue || 0).toLocaleString();
+                }
+
+                // Fetch appointments
+                const apptRes = await fetch(`${API_URL}/admin/appointments`);
+                const apptData = await apptRes.json();
+                allAppointments = apptData.data || [];
+                renderAppointmentsTable(allAppointments.slice(0, 10), 'recentAppointmentsTable');
+                renderAppointmentsTable(allAppointments, 'allAppointmentsTable');
+                renderPaymentsTable(allAppointments.filter(a => a.payment_status === 'paid'));
+
+                // Fetch users
+                const usersRes = await fetch(`${API_URL}/admin/users`);
+                const usersData = await usersRes.json();
+                allUsers = usersData.data || [];
+                renderUsersTable(allUsers);
+
+                document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+                console.log('✅ Data refreshed');
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('lastUpdated').textContent = 'Error loading data';
+            }
+        }
+
+        // ============================================
+        // RENDER TABLES
+        // ============================================
+        function renderAppointmentsTable(appointments, containerId) {
+            const container = document.getElementById(containerId);
+            
+            if (!appointments || appointments.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--gray-500); padding: 40px;">No appointments found</p>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Service</th>
+                            <th>Date & Time</th>
+                            <th>Status</th>
+                            <th>Payment</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            appointments.forEach(apt => {
+                const statusClass = apt.status === 'confirmed' ? 'success' : apt.status === 'cancelled' ? 'danger' : 'warning';
+                const paymentClass = apt.payment_status === 'paid' ? 'success' : 'warning';
+                
+                html += `
+                    <tr>
+                        <td>
+                            <strong>${apt.full_name || 'N/A'}</strong><br>
+                            <small style="color: var(--gray-500)">${apt.email || ''}</small>
+                        </td>
+                        <td>${apt.service || 'N/A'}</td>
+                        <td>${apt.date || 'N/A'} ${apt.time || ''}</td>
+                        <td><span class="badge badge-${statusClass}">${apt.status || 'pending'}</span></td>
+                        <td><span class="badge badge-${paymentClass}">${apt.payment_status || 'pending'}</span></td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn edit" onclick="updateStatus('${apt.id}', 'confirmed')" title="Confirm">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="action-btn delete" onclick="updateStatus('${apt.id}', 'cancelled')" title="Cancel">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function renderUsersTable(users) {
+            const container = document.getElementById('usersTable');
+            
+            if (!users || users.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--gray-500); padding: 40px;">No users found</p>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            users.forEach(user => {
+                html += `
+                    <tr>
+                        <td><strong>${user.name || 'N/A'}</strong></td>
+                        <td>${user.email || 'N/A'}</td>
+                        <td>${user.phone || 'N/A'}</td>
+                        <td><span class="badge badge-info">${user.role || 'user'}</span></td>
+                        <td>${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function renderPaymentsTable(payments) {
+            const container = document.getElementById('paymentsTable');
+            
+            if (!payments || payments.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--gray-500); padding: 40px;">No payments found</p>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Service</th>
+                            <th>Amount</th>
+                            <th>Reference</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            payments.forEach(payment => {
+                html += `
+                    <tr>
+                        <td><strong>${payment.full_name || 'N/A'}</strong></td>
+                        <td>${payment.service || 'N/A'}</td>
+                        <td><strong>₦${(payment.amount || 0).toLocaleString()}</strong></td>
+                        <td><small>${payment.payment_reference || 'N/A'}</small></td>
+                        <td>${payment.created_at ? new Date(payment.created_at).toLocaleDateString() : 'N/A'}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // ============================================
+        // ACTIONS
+        // ============================================
+        async function updateStatus(id, status) {
+            if (!confirm(`Are you sure you want to ${status} this appointment?`)) return;
+
+            try {
+                const response = await fetch(`${API_URL}/appointments/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('✅ Appointment updated!');
+                    refreshData();
+                } else {
+                    alert('❌ Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Update error:', error);
+                alert('❌ Failed to update appointment');
+            }
+        }
+
+        function filterAppointments(filter) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            let filtered = allAppointments;
+            if (filter !== 'all') {
+                filtered = allAppointments.filter(a => a.status === filter);
+            }
+            renderAppointmentsTable(filtered, 'allAppointmentsTable');
+        }
+
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        function showSection(section) {
+            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('appointmentsSection').style.display = 'none';
+            document.getElementById('usersSection').style.display = 'none';
+            document.getElementById('paymentsSection').style.display = 'none';
+
+            document.getElementById(section + 'Section').style.display = 'block';
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
