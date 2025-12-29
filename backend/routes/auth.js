@@ -7,6 +7,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { createClient } = require('@supabase/supabase-js');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 // Supabase
@@ -18,95 +19,96 @@ if (supabaseUrl && supabaseKey) {
     console.log('   ↳ Auth: Supabase connected');
 }
 
-// Email Service - Import from parent
-let emailService = null;
-const initEmailService = (service) => {
-    emailService = service;
-    console.log('   ↳ Auth: Email service connected');
-};
+// Email transporter - create directly in auth.js
+let transporter = null;
+if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
+    transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD
+        }
+    });
+    transporter.verify((err) => {
+        if (err) {
+            console.log('   ↳ Auth: Email error -', err.message);
+        } else {
+            console.log('   ↳ Auth: Email service ready ✓');
+        }
+    });
+}
 
 let users = [];
 
 // ============================================
-// JWT - HARDCODED TO MATCH SERVER.JS
+// JWT CONFIG
 // ============================================
-const JWT_SECRET = 'pa-healthcare-2025-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'pa-healthcare-2025-secret-key';
 const JWT_EXPIRES_IN = '7d';
 
 // ============================================
 // WELCOME EMAIL TEMPLATE
 // ============================================
 const sendWelcomeEmail = async (user) => {
-    if (!emailService) {
-        console.log('⚠️ Email service not available for welcome email');
-        return;
+    if (!transporter) {
+        console.log('⚠️ No email transporter for welcome email');
+        return { success: false };
     }
     
     try {
         const mailOptions = {
             from: `"P&A Institute" <${process.env.EMAIL_USER}>`,
             to: user.email,
-            subject: 'Welcome to P&A Institute! 🏥',
+            subject: '🏥 Welcome to P&A Institute!',
             html: `
 <!DOCTYPE html>
 <html>
 <head>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background: #f5f5f5; }
-        .container { max-width: 600px; margin: 0 auto; background: white; }
-        .header { background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); padding: 40px 30px; text-align: center; }
-        .header h1 { color: white; margin: 0; font-size: 28px; }
-        .header p { color: rgba(255,255,255,0.9); margin: 10px 0 0; }
-        .content { padding: 40px 30px; }
-        .welcome-box { background: #f0fdfa; border-left: 4px solid #14b8a6; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
-        .features { margin: 30px 0; }
-        .feature { display: flex; align-items: center; margin: 15px 0; }
-        .feature-icon { width: 40px; height: 40px; background: #14b8a6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-right: 15px; }
-        .btn { display: inline-block; background: #14b8a6; color: white; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
-        .footer { background: #1a1a2e; color: #888; padding: 30px; text-align: center; font-size: 14px; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🏥 Welcome to P&A Institute!</h1>
-            <p>Your Health is Our Top Priority</p>
+<body style="margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f5;">
+    <div style="max-width:600px;margin:0 auto;background:white;">
+        <div style="background:linear-gradient(135deg,#0d9488 0%,#14b8a6 100%);padding:40px 30px;text-align:center;">
+            <h1 style="color:white;margin:0;font-size:28px;">🏥 Welcome to P&A Institute!</h1>
+            <p style="color:rgba(255,255,255,0.9);margin:10px 0 0;">Your Health is Our Top Priority</p>
         </div>
-        <div class="content">
-            <h2>Hello ${user.name}! 👋</h2>
+        <div style="padding:40px 30px;">
+            <h2 style="margin:0 0 20px;">Hello ${user.name}! 👋</h2>
             
-            <div class="welcome-box">
+            <div style="background:#f0fdfa;border-left:4px solid #14b8a6;padding:20px;margin:20px 0;border-radius:0 8px 8px 0;">
                 <strong>Your account has been created successfully!</strong><br>
                 You can now access all our healthcare services online.
             </div>
             
-            <div class="features">
-                <h3>What you can do now:</h3>
-                <div class="feature">
-                    <div class="feature-icon">📅</div>
-                    <div><strong>Book Appointments</strong> - Schedule with our expert doctors</div>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">💊</div>
-                    <div><strong>Access Services</strong> - General consultations, specialists & more</div>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">📱</div>
-                    <div><strong>24/7 Access</strong> - Manage your health anytime, anywhere</div>
-                </div>
+            <h3 style="margin:30px 0 15px;">What you can do now:</h3>
+            
+            <div style="margin:15px 0;display:flex;align-items:center;">
+                <span style="width:40px;height:40px;background:#14b8a6;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:white;margin-right:15px;font-size:18px;">📅</span>
+                <div><strong>Book Appointments</strong> - Schedule with our expert doctors</div>
             </div>
             
-            <center>
-                <a href="https://my-pa-health.vercel.app" class="btn">Visit Your Dashboard →</a>
-            </center>
+            <div style="margin:15px 0;display:flex;align-items:center;">
+                <span style="width:40px;height:40px;background:#14b8a6;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:white;margin-right:15px;font-size:18px;">💊</span>
+                <div><strong>Access Services</strong> - General consultations, specialists & more</div>
+            </div>
             
-            <p style="color: #666; margin-top: 30px;">
+            <div style="margin:15px 0;display:flex;align-items:center;">
+                <span style="width:40px;height:40px;background:#14b8a6;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:white;margin-right:15px;font-size:18px;">📱</span>
+                <div><strong>24/7 Access</strong> - Manage your health anytime, anywhere</div>
+            </div>
+            
+            <div style="text-align:center;margin:30px 0;">
+                <a href="https://my-pa-health.vercel.app" style="display:inline-block;background:#14b8a6;color:white;padding:14px 30px;text-decoration:none;border-radius:8px;font-weight:600;">Visit Your Dashboard →</a>
+            </div>
+            
+            <p style="color:#666;margin-top:30px;">
                 If you have any questions, feel free to contact us. We're here to help!
             </p>
         </div>
-        <div class="footer">
-            <p><strong>P&A Institute</strong> - Integrative Medicine</p>
-            <p>© 2025 All rights reserved</p>
+        <div style="background:#1a1a2e;color:#888;padding:30px;text-align:center;font-size:14px;">
+            <p style="margin:0;"><strong>P&A Institute</strong> - Integrative Medicine</p>
+            <p style="margin:10px 0 0;">© 2025 All rights reserved</p>
         </div>
     </div>
 </body>
@@ -114,10 +116,12 @@ const sendWelcomeEmail = async (user) => {
             `
         };
         
-        await emailService.sendMail(mailOptions);
+        await transporter.sendMail(mailOptions);
         console.log('📧 Welcome email sent to:', user.email);
+        return { success: true };
     } catch (error) {
         console.log('⚠️ Welcome email failed:', error.message);
+        return { success: false, error: error.message };
     }
 };
 
@@ -134,10 +138,12 @@ router.post('/register', async (req, res) => {
         
         const normalizedEmail = email.toLowerCase().trim();
         
-        // Check exists
+        // Check if user exists in Supabase
         if (supabase) {
             const { data } = await supabase.from('users').select('id').eq('email', normalizedEmail).single();
-            if (data) return res.status(400).json({ success: false, message: 'User already exists with this email' });
+            if (data) {
+                return res.status(400).json({ success: false, message: 'User already exists with this email' });
+            }
         }
         
         // Also check in-memory
@@ -158,12 +164,14 @@ router.post('/register', async (req, res) => {
             created_at: new Date().toISOString()
         };
         
+        // Save to Supabase
         if (supabase) {
             const { error } = await supabase.from('users').insert([userData]);
             if (error) console.error('DB error:', error.message);
         }
         users.push(userData);
         
+        // Generate token
         const token = jwt.sign(
             { id: userData.id, email: userData.email, role: userData.role },
             JWT_SECRET,
@@ -172,11 +180,19 @@ router.post('/register', async (req, res) => {
         
         console.log('✅ Registered:', normalizedEmail);
         
-        // Send welcome email (async - don't wait)
-        sendWelcomeEmail(userData);
+        // Send welcome email (don't wait)
+        sendWelcomeEmail(userData).then(result => {
+            if (result.success) {
+                console.log('✅ Welcome email delivered to', userData.email);
+            }
+        });
         
         const { password: _, ...userWithoutPassword } = userData;
-        res.status(201).json({ success: true, message: 'Registration successful! Welcome email sent.', data: { user: userWithoutPassword, token } });
+        res.status(201).json({ 
+            success: true, 
+            message: 'Registration successful! Welcome email sent.', 
+            data: { user: userWithoutPassword, token } 
+        });
         
     } catch (error) {
         console.error('Register error:', error);
@@ -198,11 +214,16 @@ router.post('/login', async (req, res) => {
         const normalizedEmail = email.toLowerCase().trim();
         let user = null;
         
+        // Find in Supabase
         if (supabase) {
             const { data } = await supabase.from('users').select('*').eq('email', normalizedEmail).single();
             if (data) user = data;
         }
-        if (!user) user = users.find(u => u.email === normalizedEmail);
+        
+        // Fallback to in-memory
+        if (!user) {
+            user = users.find(u => u.email === normalizedEmail);
+        }
         
         if (!user) {
             return res.status(401).json({ success: false, message: 'Invalid email or password' });
@@ -250,7 +271,10 @@ router.get('/me', async (req, res) => {
         }
         if (!user) {
             const mem = users.find(u => u.id === decoded.id);
-            if (mem) { const { password, ...u } = mem; user = u; }
+            if (mem) { 
+                const { password, ...u } = mem; 
+                user = u; 
+            }
         }
         
         res.json({ success: true, data: user || decoded });
@@ -268,6 +292,4 @@ router.post('/logout', (req, res) => {
     res.json({ success: true, message: 'Logged out' });
 });
 
-// Export router and init function
 module.exports = router;
-module.exports.initEmailService = initEmailService;
