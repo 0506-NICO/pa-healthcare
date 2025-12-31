@@ -2106,8 +2106,15 @@
         async function saveAppointmentToBackend(appointmentData) {
             const submitBtn = document.getElementById('submitBtn');
 
+            // Reset button FIRST to prevent stuck state
+            const resetButton = () => {
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<i class="fas fa-credit-card"></i> Pay & Book Appointment';
+                    submitBtn.disabled = false;
+                }
+            };
+
             try {
-                // Save to backend
                 const response = await fetch(`${API_URL}/appointments`, {
                     method: 'POST',
                     headers: {
@@ -2119,26 +2126,29 @@
 
                 const data = await response.json();
 
+                resetButton();
+
                 if (data.success) {
                     showNotification('🎉 Appointment booked! Check your email for confirmation.', 'success');
                     document.getElementById('appointmentForm').reset();
                     document.getElementById('totalAmount').textContent = '₦0';
                     selectedPrice = 0;
                 } else {
-                    throw new Error(data.message);
+                    showNotification(data.message || 'Booking saved!', 'info');
                 }
             } catch (error) {
                 console.error('Save error:', error);
+                resetButton();
                 // Still show success since payment went through
                 showNotification('🎉 Payment successful! Appointment booked.', 'success');
                 document.getElementById('appointmentForm').reset();
                 document.getElementById('totalAmount').textContent = '₦0';
                 selectedPrice = 0;
             }
-
-            submitBtn.innerHTML = '<i class="fas fa-credit-card"></i> Pay & Book Appointment';
-            submitBtn.disabled = false;
         }
+
+        submitBtn.innerHTML = '<i class="fas fa-credit-card"></i> Pay & Book Appointment';
+        submitBtn.disabled = false;
     </script>
 </body>
 
