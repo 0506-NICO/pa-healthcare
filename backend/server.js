@@ -1,6 +1,6 @@
 // ============================================
 // P&A HEALTHCARE BACKEND - PRODUCTION READY
-// With CSRF Protection & Welcome Email
+// With CSRF Protection
 // ============================================
 
 const express = require('express');
@@ -31,6 +31,10 @@ function generateCsrfToken() {
 function validateCsrfToken(token) {
     if (!token) return false;
     const isValid = csrfTokens.has(token);
+    if (isValid) {
+        // Token used, remove it (one-time use) - or keep for session
+        // csrfTokens.delete(token);
+    }
     return isValid;
 }
 
@@ -51,9 +55,9 @@ const allowedOrigins = [
     'http://127.0.0.1:5500',
     'http://127.0.0.1:3000',
     'https://my-pa-health.vercel.app',
-    'https://pa-healthcare-projectile.up.railway.app'
+    'https://pa-healthcare-projectile.up.railway.app',
+    'https://checkout.paystack.com'  // ← ADD THIS LINE
 ].filter(Boolean);
-
 // ============================================
 // MIDDLEWARE
 // ============================================
@@ -62,7 +66,7 @@ app.use(cors({
         // Allow requests with no origin (mobile apps, Postman)
         if (!origin) return callback(null, true);
         
-        if (allowedOrigins.some(allowed => origin === allowed || origin.startsWith(allowed))) {
+        if (allowedOrigins.some(allowed => origin.startsWith(allowed.split('://')[0] + '://' + allowed.split('://')[1]?.split('/')[0]) || allowed === origin)) {
             return callback(null, true);
         }
         
@@ -71,7 +75,6 @@ app.use(cors({
             return callback(null, true);
         }
         
-        console.log('❌ CORS blocked:', origin);
         callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
@@ -91,9 +94,10 @@ app.use((req, res, next) => {
 });
 
 // ============================================
-// CSRF MIDDLEWARE
+// CSRF MIDDLEWARE (for state-changing requests)
 // ============================================
 const csrfProtection = (req, res, next) => {
+    // Skip in development or for safe methods
     if (process.env.NODE_ENV !== 'production') return next();
     if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
     
@@ -133,22 +137,7 @@ try {
     app.locals.emailService = emailService;
     console.log('✅ Email service loaded');
 } catch (e) {
-    console.log('⚠️  Email not loaded:', e.message);
-}
-
-// ============================================
-// CONNECT EMAIL TO AUTH ROUTES
-// ============================================
-let authRoutes = null;
-try {
-    authRoutes = require('./routes/auth');
-    // Connect email service to auth for welcome emails
-    if (authRoutes.initEmailService && emailService && emailService.transporter) {
-        authRoutes.initEmailService(emailService.transporter);
-        console.log('✅ Welcome email enabled');
-    }
-} catch (e) {
-    console.log('⚠️  Auth routes error:', e.message);
+    console.log('⚠️  Email not loaded');
 }
 
 // ============================================
@@ -173,11 +162,12 @@ app.get('/api/csrf-token', (req, res) => {
     const token = generateCsrfToken();
     csrfTokens.set(token, Date.now());
     
+    // Also set as cookie for additional security
     res.cookie('csrf-token', token, {
-        httpOnly: false,
+        httpOnly: false, // Frontend needs to read it
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 60 * 60 * 1000
+        maxAge: 60 * 60 * 1000 // 1 hour
     });
     
     res.json({ success: true, csrfToken: token });
@@ -186,14 +176,6 @@ app.get('/api/csrf-token', (req, res) => {
 // ============================================
 // HEALTH CHECK
 // ============================================
-app.get('/', (req, res) => {
-    res.json({ 
-        status: 'OK',
-        message: 'P&A Healthcare API is running',
-        version: '2.0.0'
-    });
-});
-
 app.get('/api/health', (req, res) => {
     res.json({ 
         status: 'OK',
@@ -205,9 +187,11 @@ app.get('/api/health', (req, res) => {
 // ============================================
 // AUTH ROUTES
 // ============================================
-if (authRoutes) {
-    app.use('/api/auth', authRoutes);
+try {
+    app.use('/api/auth', require('./routes/auth'));
     console.log('✅ Auth routes loaded');
+} catch (e) {
+    console.log('❌ Auth error:', e.message);
 }
 
 // ============================================
@@ -230,6 +214,7 @@ try {
         };
         if (supabase) await supabase.from('appointments').insert([data]);
         
+        // Send confirmation email
         if (emailService && email) {
             try {
                 await emailService.sendAppointmentConfirmation({ to: email, name: fullName, service, date, time, appointmentId: id });
@@ -429,7 +414,6 @@ app.listen(PORT, () => {
 ║   Port: ${PORT}                                          ║
 ║   Mode: ${process.env.NODE_ENV || 'development'}                              ║
 ║   CSRF: Enabled                                       ║
-║   Welcome Email: ${authRoutes?.initEmailService ? 'Enabled' : 'Disabled'}                            ║
 ╚═══════════════════════════════════════════════════════╝
 
 📡 Endpoints Ready:
