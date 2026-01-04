@@ -1,303 +1,298 @@
 // ============================================
-// EMAIL SERVICE - GMAIL SMTP
-// Place this file at: backend/services/email.js
+// EMAIL SERVICE - USING RESEND
 // ============================================
 
-const nodemailer = require('nodemailer');
-require('dotenv').config();
+const { Resend } = require('resend');
 
-// Create Gmail transporter
-let transporter = null;
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY || 're_PLytx8TP_7wV4RP3L83X6cihavtVre1Yi');
 
-// Check for email configuration
-const emailUser = process.env.EMAIL_USER || process.env.SMTP_USER;
-const emailPass = process.env.EMAIL_PASSWORD || process.env.EMAIL_PASS || process.env.SMTP_PASS;
-const emailService = process.env.EMAIL_SERVICE || 'gmail';
+// Your verified sender email (use Resend's default for now)
+const FROM_EMAIL = process.env.FROM_EMAIL || 'P&A Institute <onboarding@resend.dev>';
 
-if (emailUser && emailPass) {
-    transporter = nodemailer.createTransport({
-        service: emailService,
-        auth: {
-            user: emailUser,
-            pass: emailPass
-        }
-    });
-    
-    // Verify connection
-    transporter.verify((error, success) => {
-        if (error) {
-            console.log('⚠️  Email service error:', error.message);
-            console.log('   Make sure you have set up Gmail App Password correctly');
-        } else {
-            console.log('✅ Email service ready');
-        }
-    });
-} else {
-    console.log('⚠️  Email service not configured - set EMAIL_USER and EMAIL_PASSWORD in .env');
-}
-
-// ============================================
-// EMAIL TEMPLATES
-// ============================================
-
-const templates = {
-    
-    // Welcome Email
-    'welcome': (data) => `
-        <!DOCTYPE html>
-        <html>
-        <head><meta charset="utf-8"></head>
-        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #1a936f 0%, #114b5f 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="color: white; margin: 0;">🏥 P&A Institute</h1>
-                <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">of Integrative Medicine</p>
-            </div>
-            <div style="padding: 30px; background: #f9f9f9;">
-                <h2 style="color: #1a936f;">Welcome, ${data.name}! 🎉</h2>
-                <p>Thank you for registering with P&A Institute of Integrative Medicine.</p>
-                <p>You can now:</p>
-                <ul>
-                    <li>Book appointments online 24/7</li>
-                    <li>Access our wide range of medical services</li>
-                    <li>View and manage your appointments</li>
-                    <li>Receive instant confirmations</li>
-                </ul>
-                <p style="text-align: center; margin-top: 30px;">
-                    <a href="${process.env.WEBSITE_URL || '#'}" style="background: linear-gradient(135deg, #1a936f, #114b5f); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; display: inline-block;">Book Your First Appointment</a>
-                </p>
-            </div>
-            <div style="background: #114b5f; padding: 20px; text-align: center; border-radius: 0 0 10px 10px;">
-                <p style="color: white; margin: 0;">P&A Institute of Integrative Medicine</p>
-                <p style="color: rgba(255,255,255,0.7); margin: 5px 0 0 0; font-size: 12px;">© ${new Date().getFullYear()} All rights reserved</p>
-            </div>
-        </body>
-        </html>
-    `,
-    
-    // Appointment Confirmation
-    'appointment-confirmation': (data) => `
-        <!DOCTYPE html>
-        <html>
-        <head><meta charset="utf-8"></head>
-        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #1a936f 0%, #114b5f 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="color: white; margin: 0;">🏥 P&A Institute</h1>
-            </div>
-            <div style="padding: 30px; background: #f9f9f9;">
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <span style="background: #38a169; color: white; padding: 10px 25px; border-radius: 25px; font-weight: bold;">✅ Appointment Confirmed!</span>
-                </div>
-                <p>Dear <strong>${data.fullName}</strong>,</p>
-                <p>Your appointment has been successfully booked!</p>
-                
-                <div style="background: white; padding: 20px; border-left: 4px solid #1a936f; margin: 20px 0;">
-                    <h3 style="color: #114b5f; margin: 0 0 15px 0;">📋 Appointment Details</h3>
-                    <p style="margin: 8px 0;"><strong>Service:</strong> ${data.service}</p>
-                    <p style="margin: 8px 0;"><strong>Date:</strong> 📅 ${data.date}</p>
-                    <p style="margin: 8px 0;"><strong>Time:</strong> 🕐 ${data.time}</p>
-                    <p style="margin: 8px 0;"><strong>ID:</strong> #${data.appointmentId}</p>
-                </div>
-                
-                <div style="background: #fffaf0; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                    <h4 style="color: #c05621; margin: 0 0 10px 0;">⚠️ Important Reminders:</h4>
-                    <ul style="color: #744210; margin: 0; padding-left: 20px;">
-                        <li>Please arrive 10-15 minutes early</li>
-                        <li>Bring a valid ID</li>
-                        <li>Contact us 24 hours in advance to reschedule</li>
-                    </ul>
-                </div>
-            </div>
-            <div style="background: #114b5f; padding: 20px; text-align: center; border-radius: 0 0 10px 10px;">
-                <p style="color: white; margin: 0;">P&A Institute of Integrative Medicine</p>
-                <p style="color: rgba(255,255,255,0.7); margin: 5px 0 0 0; font-size: 12px;">📧 ${emailUser || 'info@pandainstitute.com'}</p>
-            </div>
-        </body>
-        </html>
-    `,
-    
-    // Payment Receipt
-    'payment-receipt': (data) => `
-        <!DOCTYPE html>
-        <html>
-        <head><meta charset="utf-8"></head>
-        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #1a936f 0%, #114b5f 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="color: white; margin: 0;">🏥 P&A Institute</h1>
-                <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Payment Receipt</p>
-            </div>
-            <div style="padding: 30px; background: #f9f9f9;">
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <div style="width: 60px; height: 60px; background: #38a169; border-radius: 50%; display: inline-block; line-height: 60px; font-size: 30px;">✓</div>
-                    <h2 style="color: #38a169; margin: 15px 0 0 0;">Payment Successful!</h2>
-                </div>
-                
-                <p style="text-align: center;">Dear <strong>${data.fullName}</strong>, your payment has been processed.</p>
-                
-                <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                    <h3 style="color: #114b5f; text-align: center; border-bottom: 2px solid #1a936f; padding-bottom: 10px;">🧾 RECEIPT</h3>
-                    <p style="margin: 10px 0;"><strong>Reference:</strong> ${data.reference}</p>
-                    <p style="margin: 10px 0;"><strong>Service:</strong> ${data.service}</p>
-                    <p style="margin: 10px 0;"><strong>Date:</strong> ${data.date} at ${data.time}</p>
-                    <p style="margin: 10px 0;"><strong>Payment Method:</strong> ${data.paymentMethod || 'Online Payment'}</p>
-                    
-                    <div style="background: linear-gradient(135deg, #1a936f, #114b5f); padding: 20px; border-radius: 8px; text-align: center; margin-top: 20px;">
-                        <span style="color: rgba(255,255,255,0.8); font-size: 12px;">AMOUNT PAID</span><br>
-                        <strong style="color: white; font-size: 28px;">₦${Number(data.amount).toLocaleString()}</strong>
-                    </div>
-                </div>
-                
-                <p style="color: #666; font-size: 14px; text-align: center;">💡 Keep this receipt for your records.</p>
-            </div>
-            <div style="background: #114b5f; padding: 20px; text-align: center; border-radius: 0 0 10px 10px;">
-                <p style="color: white; margin: 0;">P&A Institute of Integrative Medicine</p>
-            </div>
-        </body>
-        </html>
-    `,
-    
-    // Appointment Status Update
-    'appointment-status-update': (data) => `
-        <!DOCTYPE html>
-        <html>
-        <head><meta charset="utf-8"></head>
-        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #1a936f 0%, #114b5f 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="color: white; margin: 0;">🏥 P&A Institute</h1>
-            </div>
-            <div style="padding: 30px; background: #f9f9f9;">
-                <h2 style="color: #114b5f;">📋 Appointment Status Update</h2>
-                <p>Dear <strong>${data.fullName}</strong>,</p>
-                <p>Your appointment status has been updated to:</p>
-                
-                <div style="text-align: center; margin: 20px 0;">
-                    <span style="background: ${data.status === 'confirmed' ? '#38a169' : data.status === 'cancelled' ? '#e53e3e' : '#d69e2e'}; color: white; padding: 12px 25px; border-radius: 25px; font-weight: bold; text-transform: uppercase;">${data.status}</span>
-                </div>
-                
-                <div style="background: white; padding: 15px; border-radius: 8px;">
-                    <p style="margin: 5px 0;"><strong>Service:</strong> ${data.service}</p>
-                    <p style="margin: 5px 0;"><strong>Date:</strong> ${data.date}</p>
-                    <p style="margin: 5px 0;"><strong>Time:</strong> ${data.time}</p>
-                </div>
-            </div>
-            <div style="background: #114b5f; padding: 20px; text-align: center; border-radius: 0 0 10px 10px;">
-                <p style="color: white; margin: 0;">P&A Institute of Integrative Medicine</p>
-            </div>
-        </body>
-        </html>
-    `,
-    
-    // Password Reset
-    'password-reset': (data) => `
-        <!DOCTYPE html>
-        <html>
-        <head><meta charset="utf-8"></head>
-        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #1a936f 0%, #114b5f 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="color: white; margin: 0;">🏥 P&A Institute</h1>
-            </div>
-            <div style="padding: 30px; background: #f9f9f9;">
-                <h2 style="color: #114b5f; text-align: center;">🔐 Password Reset Request</h2>
-                <p>Dear <strong>${data.name}</strong>,</p>
-                <p>Click the button below to reset your password:</p>
-                
-                <p style="text-align: center; margin: 30px 0;">
-                    <a href="${data.resetUrl}" style="background: linear-gradient(135deg, #1a936f, #114b5f); color: white; padding: 15px 40px; text-decoration: none; border-radius: 25px; display: inline-block; font-weight: bold;">Reset My Password</a>
-                </p>
-                
-                <div style="background: #fffaf0; padding: 15px; border-radius: 8px;">
-                    <p style="color: #744210; margin: 0; font-size: 14px;">⚠️ This link expires in 1 hour. If you didn't request this, ignore this email.</p>
-                </div>
-            </div>
-            <div style="background: #114b5f; padding: 20px; text-align: center; border-radius: 0 0 10px 10px;">
-                <p style="color: white; margin: 0;">P&A Institute of Integrative Medicine</p>
-            </div>
-        </body>
-        </html>
-    `,
-    
-    // Password Changed
-    'password-changed': (data) => `
-        <!DOCTYPE html>
-        <html>
-        <head><meta charset="utf-8"></head>
-        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #1a936f 0%, #114b5f 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="color: white; margin: 0;">🏥 P&A Institute</h1>
-            </div>
-            <div style="padding: 30px; background: #f9f9f9; text-align: center;">
-                <div style="width: 60px; height: 60px; background: #38a169; border-radius: 50%; display: inline-block; line-height: 60px; font-size: 30px;">✓</div>
-                <h2 style="color: #38a169;">Password Changed Successfully!</h2>
-                <p>Dear <strong>${data.name}</strong>,</p>
-                <p>Your password has been changed. You can now log in with your new password.</p>
-                
-                <div style="background: #fff5f5; padding: 15px; border-radius: 8px; margin-top: 20px;">
-                    <p style="color: #c53030; margin: 0; font-size: 14px;">🚨 If you didn't make this change, contact us immediately.</p>
-                </div>
-            </div>
-            <div style="background: #114b5f; padding: 20px; text-align: center; border-radius: 0 0 10px 10px;">
-                <p style="color: white; margin: 0;">P&A Institute of Integrative Medicine</p>
-            </div>
-        </body>
-        </html>
-    `
-};
+console.log('📧 Email service: Resend initialized');
 
 // ============================================
 // SEND EMAIL FUNCTION
 // ============================================
-async function sendEmail(options) {
+async function sendEmail(to, subject, html) {
     try {
-        if (!transporter) {
-            console.log('⚠️  Email service not configured - email not sent');
-            return { success: false, error: 'Email service not configured' };
-        }
-        
-        let htmlContent = options.html;
-        let subject = options.subject;
-        
-        // If template provided, use it
-        if (options.template && templates[options.template]) {
-            htmlContent = templates[options.template](options.data || {});
-            
-            // Generate subject if not provided
-            if (!subject) {
-                const subjectMap = {
-                    'welcome': '🏥 Welcome to P&A Institute of Integrative Medicine!',
-                    'appointment-confirmation': '✅ Appointment Confirmed - P&A Institute',
-                    'payment-receipt': '🧾 Payment Receipt - P&A Institute',
-                    'appointment-status-update': '📋 Appointment Status Update - P&A Institute',
-                    'password-reset': '🔐 Password Reset Request - P&A Institute',
-                    'password-changed': '✅ Password Changed - P&A Institute'
-                };
-                subject = subjectMap[options.template] || 'Notification from P&A Institute';
-            }
-        }
-        
-        // Send email
-        const info = await transporter.sendMail({
-            from: process.env.EMAIL_FROM || `"P&A Institute" <${emailUser}>`,
-            to: options.to,
+        const { data, error } = await resend.emails.send({
+            from: FROM_EMAIL,
+            to: to,
             subject: subject,
-            html: htmlContent
+            html: html
         });
-        
-        console.log(`✅ Email sent to ${options.to} - ID: ${info.messageId}`);
-        
-        return { success: true, messageId: info.messageId };
-        
-    } catch (error) {
-        console.error('❌ Email sending error:', error.message);
-        return { success: false, error: error.message };
+
+        if (error) {
+            console.log('❌ Email error:', error.message);
+            return { success: false, error: error.message };
+        }
+
+        console.log('✅ Email sent to:', to);
+        return { success: true, id: data?.id };
+    } catch (err) {
+        console.log('❌ Email failed:', err.message);
+        return { success: false, error: err.message };
     }
 }
 
 // ============================================
-// SEND SMS PLACEHOLDER
+// APPOINTMENT CONFIRMATION EMAIL
 // ============================================
-async function sendSMS(options) {
-    console.log('📱 SMS not configured');
-    return { success: false, error: 'SMS not configured' };
+async function sendAppointmentConfirmation({ to, name, service, date, time, appointmentId }) {
+    const subject = '📅 Appointment Booked - P&A Institute';
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f5;">
+    <div style="max-width:600px;margin:0 auto;background:white;">
+        <div style="background:linear-gradient(135deg,#0d9488 0%,#14b8a6 100%);padding:40px 30px;text-align:center;">
+            <h1 style="color:white;margin:0;font-size:28px;">🏥 P&A Institute</h1>
+            <p style="color:rgba(255,255,255,0.9);margin:10px 0 0;">Appointment Confirmation</p>
+        </div>
+        <div style="padding:40px 30px;">
+            <div style="text-align:center;margin-bottom:30px;">
+                <span style="font-size:60px;">📅</span>
+                <h2 style="margin:15px 0 0;color:#f59e0b;">Appointment Booked!</h2>
+            </div>
+            
+            <p style="font-size:16px;color:#333;text-align:center;margin-bottom:30px;">
+                Hi <strong>${name}</strong>, your appointment has been successfully booked and is pending confirmation.
+            </p>
+            
+            <div style="background:#f8fafc;border-radius:12px;padding:25px;margin:20px 0;">
+                <h3 style="margin:0 0 20px;color:#333;border-bottom:2px solid #f59e0b;padding-bottom:10px;">
+                    Appointment Details
+                </h3>
+                <table style="width:100%;border-collapse:collapse;">
+                    <tr>
+                        <td style="padding:10px 0;color:#666;width:40%;">Reference:</td>
+                        <td style="padding:10px 0;color:#333;font-weight:600;">${appointmentId || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 0;color:#666;">Service:</td>
+                        <td style="padding:10px 0;color:#333;font-weight:600;">${service}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 0;color:#666;">Date:</td>
+                        <td style="padding:10px 0;color:#333;font-weight:600;">${date}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 0;color:#666;">Time:</td>
+                        <td style="padding:10px 0;color:#333;font-weight:600;">${time}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 0;color:#666;">Status:</td>
+                        <td style="padding:10px 0;">
+                            <span style="background:#f59e0b;color:white;padding:5px 15px;border-radius:20px;font-size:12px;font-weight:600;">
+                                PENDING
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <p style="color:#666;margin-top:30px;font-size:14px;text-align:center;">
+                We will confirm your appointment shortly. You'll receive another email once confirmed.
+            </p>
+        </div>
+        <div style="background:#1a1a2e;color:#888;padding:30px;text-align:center;font-size:14px;">
+            <p style="margin:0;"><strong>P&A Institute</strong> - Integrative Medicine</p>
+            <p style="margin:10px 0 0;">📞 +234 905 5066 381 | 📍 Lagos, Nigeria</p>
+        </div>
+    </div>
+</body>
+</html>
+    `;
+
+    return await sendEmail(to, subject, html);
 }
 
-// Export functions
-module.exports = { sendEmail, sendSMS };
+// ============================================
+// STATUS UPDATE EMAIL
+// ============================================
+async function sendStatusUpdate(to, appointment) {
+    const status = appointment.status || 'updated';
+    const name = appointment.full_name || appointment.fullName || 'Patient';
+    
+    const templates = {
+        'confirmed': {
+            subject: '✅ Appointment Confirmed - P&A Institute',
+            icon: '✅',
+            title: 'Appointment Confirmed!',
+            message: 'Great news! Your appointment has been confirmed.',
+            color: '#10b981'
+        },
+        'cancelled': {
+            subject: '❌ Appointment Cancelled - P&A Institute',
+            icon: '❌',
+            title: 'Appointment Cancelled',
+            message: 'Your appointment has been cancelled.',
+            color: '#ef4444'
+        },
+        'completed': {
+            subject: '🎉 Thank You - P&A Institute',
+            icon: '🎉',
+            title: 'Thank You!',
+            message: 'Your appointment has been completed. Thank you for visiting us!',
+            color: '#3b82f6'
+        },
+        'pending': {
+            subject: '📅 Appointment Pending - P&A Institute',
+            icon: '📅',
+            title: 'Appointment Pending',
+            message: 'Your appointment is pending confirmation.',
+            color: '#f59e0b'
+        }
+    };
+
+    const template = templates[status] || templates['pending'];
+
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f5;">
+    <div style="max-width:600px;margin:0 auto;background:white;">
+        <div style="background:linear-gradient(135deg,#0d9488 0%,#14b8a6 100%);padding:40px 30px;text-align:center;">
+            <h1 style="color:white;margin:0;font-size:28px;">🏥 P&A Institute</h1>
+            <p style="color:rgba(255,255,255,0.9);margin:10px 0 0;">Appointment Update</p>
+        </div>
+        <div style="padding:40px 30px;">
+            <div style="text-align:center;margin-bottom:30px;">
+                <span style="font-size:60px;">${template.icon}</span>
+                <h2 style="margin:15px 0 0;color:${template.color};">${template.title}</h2>
+            </div>
+            
+            <p style="font-size:16px;color:#333;text-align:center;margin-bottom:30px;">
+                Hi <strong>${name}</strong>, ${template.message}
+            </p>
+            
+            <div style="background:#f8fafc;border-radius:12px;padding:25px;margin:20px 0;">
+                <h3 style="margin:0 0 20px;color:#333;border-bottom:2px solid ${template.color};padding-bottom:10px;">
+                    Appointment Details
+                </h3>
+                <table style="width:100%;border-collapse:collapse;">
+                    <tr>
+                        <td style="padding:10px 0;color:#666;width:40%;">Service:</td>
+                        <td style="padding:10px 0;color:#333;font-weight:600;">${appointment.service || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 0;color:#666;">Date:</td>
+                        <td style="padding:10px 0;color:#333;font-weight:600;">${appointment.date || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 0;color:#666;">Time:</td>
+                        <td style="padding:10px 0;color:#333;font-weight:600;">${appointment.time || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 0;color:#666;">Status:</td>
+                        <td style="padding:10px 0;">
+                            <span style="background:${template.color};color:white;padding:5px 15px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;">
+                                ${status}
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            ${status === 'confirmed' ? `
+            <div style="background:#f0fdfa;border-left:4px solid #14b8a6;padding:15px 20px;margin:20px 0;border-radius:0 8px 8px 0;">
+                <strong>📍 Reminder:</strong><br>
+                Please arrive 15 minutes before your scheduled time.<br>
+                Location: No 8 Animashaun Cl, Lagos
+            </div>
+            ` : ''}
+            
+            ${status === 'cancelled' ? `
+            <div style="text-align:center;margin:30px 0;">
+                <a href="https://my-pa-health.vercel.app" style="display:inline-block;background:#14b8a6;color:white;padding:14px 30px;text-decoration:none;border-radius:8px;font-weight:600;">
+                    Book New Appointment →
+                </a>
+            </div>
+            ` : ''}
+            
+            <p style="color:#666;margin-top:30px;font-size:14px;text-align:center;">
+                Questions? Contact us at miniquehairs@gmail.com
+            </p>
+        </div>
+        <div style="background:#1a1a2e;color:#888;padding:30px;text-align:center;font-size:14px;">
+            <p style="margin:0;"><strong>P&A Institute</strong> - Integrative Medicine</p>
+            <p style="margin:10px 0 0;">📞 +234 905 5066 381 | 📍 Lagos, Nigeria</p>
+        </div>
+    </div>
+</body>
+</html>
+    `;
+
+    return await sendEmail(to, template.subject, html);
+}
+
+// ============================================
+// WELCOME EMAIL
+// ============================================
+async function sendWelcomeEmail(to, name) {
+    const subject = '🏥 Welcome to P&A Institute!';
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f5;">
+    <div style="max-width:600px;margin:0 auto;background:white;">
+        <div style="background:linear-gradient(135deg,#0d9488 0%,#14b8a6 100%);padding:40px 30px;text-align:center;">
+            <h1 style="color:white;margin:0;font-size:28px;">🏥 Welcome to P&A Institute!</h1>
+            <p style="color:rgba(255,255,255,0.9);margin:10px 0 0;">Your Health is Our Priority</p>
+        </div>
+        <div style="padding:40px 30px;">
+            <h2 style="margin:0 0 20px;">Hello ${name}! 👋</h2>
+            
+            <div style="background:#f0fdfa;border-left:4px solid #14b8a6;padding:20px;margin:20px 0;border-radius:0 8px 8px 0;">
+                <strong>Your account has been created successfully!</strong><br>
+                You can now access all our healthcare services online.
+            </div>
+            
+            <h3 style="margin:30px 0 15px;">What you can do:</h3>
+            <ul style="color:#333;line-height:2;">
+                <li>📅 Book appointments with our specialists</li>
+                <li>💊 Access various healthcare services</li>
+                <li>📱 Manage your health 24/7</li>
+            </ul>
+            
+            <div style="text-align:center;margin:30px 0;">
+                <a href="https://my-pa-health.vercel.app" style="display:inline-block;background:#14b8a6;color:white;padding:14px 30px;text-decoration:none;border-radius:8px;font-weight:600;">
+                    Visit Dashboard →
+                </a>
+            </div>
+        </div>
+        <div style="background:#1a1a2e;color:#888;padding:30px;text-align:center;font-size:14px;">
+            <p style="margin:0;"><strong>P&A Institute</strong> - Integrative Medicine</p>
+            <p style="margin:10px 0 0;">© 2025 All rights reserved</p>
+        </div>
+    </div>
+</body>
+</html>
+    `;
+
+    return await sendEmail(to, subject, html);
+}
+
+// ============================================
+// EXPORTS
+// ============================================
+module.exports = {
+    sendEmail,
+    sendAppointmentConfirmation,
+    sendStatusUpdate,
+    sendWelcomeEmail
+};
