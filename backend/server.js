@@ -12,7 +12,7 @@ const crypto = require('crypto');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 5002;
+const PORT = process.env.PORT || 3000;
 
 // ============================================
 // JWT SECRET
@@ -52,11 +52,14 @@ setInterval(() => {
 const allowedOrigins = [
     'http://localhost:5500',
     'http://localhost:3000',
+    'http://localhost:5000',
     'http://127.0.0.1:5500',
     'http://127.0.0.1:3000',
+    'http://127.0.0.1:5000',
     'https://my-pa-health.vercel.app',
     'https://pa-healthcare-projectile.up.railway.app',
-    'https://checkout.paystack.com'  // ← ADD THIS LINE
+    'https://checkout.paystack.com',
+    process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : null
 ].filter(Boolean);
 // ============================================
 // MIDDLEWARE
@@ -406,7 +409,7 @@ app.use((err, req, res, next) => {
 // ============================================
 // START SERVER
 // ============================================
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`
 ╔═══════════════════════════════════════════════════════╗
 ║   🏥 P&A HEALTHCARE - PRODUCTION READY                ║

@@ -4,7 +4,7 @@
 // ============================================
 
 // API Configuration
-const API_URL = 'http://localhost:5002/api';
+const API_URL = window.location.protocol + '//' + window.location.host.replace(':5000', ':3000') + '/api';
 const PAYSTACK_PUBLIC_KEY = 'pk_test_f84e02cb1d28923c5f283e04c6a0e9dfc3ab275c';
 
 // ============================================
