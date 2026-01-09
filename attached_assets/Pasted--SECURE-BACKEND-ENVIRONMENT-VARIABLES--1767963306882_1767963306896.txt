@@ -1,0 +1,59 @@
+# ============================================
+# SECURE BACKEND ENVIRONMENT VARIABLES
+# ============================================
+
+# ============================================
+# SERVER CONFIGURATION
+# ============================================
+NODE_ENV=production
+PORT=5002
+
+# ============================================
+# SECURITY
+# ============================================
+JWT_SECRET=pa-healthcare-2025-secret-key
+JWT_EXPIRES_IN=7d
+
+# ============================================
+# DATABASE - SUPABASE
+# ============================================
+SUPABASE_URL=https://mcsxmhvftfrrvonvxjjx.supabase.co
+SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jc3htaHZmdGZycnZvbnZ4amp4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDg0MzM4MSwiZXhwIjoyMDgwNDE5MzgxfQ.sX0O5HkuHCAMLHwL6NJhN5IoG30x-wDgilmK-XqeHSU
+
+# ============================================
+# PAYMENT - PAYSTACK
+# ============================================
+PAYSTACK_SECRET_KEY=sk_test_00c2fb89a0ce1feae098f51663bce6ef4f29e62a
+PAYSTACK_PUBLIC_KEY=pk_test_f84e02cb1d28923c5f283e04c6a0e9dfc3ab275c
+
+# ============================================
+# EMAIL SERVICE - RESEND
+# ============================================
+RESEND_API_KEY=re_PLytx8TP_7wV4RP3L83X6cihavtVre1Yi
+FROM_EMAIL=P&A Institute <onboarding@resend.dev>
+
+# ============================================
+# BUSINESS INFORMATION
+# ============================================
+BUSINESS_NAME=P&A Institute of Integrative Medicine
+BUSINESS_EMAIL=miniquehairs@gmail.com
+BUSINESS_PHONE=+234 905 5066 381
+BUSINESS_ADDRESS=No 8 Animashaun Cl, Lagos, Nigeria
+
+# ============================================
+# FRONTEND URLs
+# ============================================
+FRONTEND_URL=https://my-pa-health.vercel.app
+
+# ============================================
+# ADMIN CREDENTIALS
+# ============================================
+ADMIN_EMAIL=miniquehairs@gmail.com
+ADMIN_PASSWORD=Ominipotent440#
+ADMIN_NAME=Admin NICO
+
+# ============================================
+# CORS SETTINGS
+# ============================================
+CORS_ORIGIN=*
+CORS_CREDENTIALS=true
