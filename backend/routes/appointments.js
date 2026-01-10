@@ -1,12 +1,14 @@
 // ============================================
-// APPOINTMENTS ROUTES - WITH EMAIL NOTIFICATIONS
+// APPOINTMENTS ROUTES - WITH RESEND EMAIL
 // ============================================
 
 const express = require("express");
 const router = express.Router();
 const { createClient } = require("@supabase/supabase-js");
 const { Resend } = require("resend");
+require("dotenv").config();
 
+// Resend Email
 let resend = null;
 const FROM_EMAIL =
     process.env.FROM_EMAIL || "P&A Institute <onboarding@resend.dev>";
@@ -14,7 +16,6 @@ if (process.env.RESEND_API_KEY) {
     resend = new Resend(process.env.RESEND_API_KEY);
     console.log("   ↳ Appointments: Email service ready");
 }
-require("dotenv").config();
 
 // Supabase
 const supabaseUrl = process.env.SUPABASE_URL?.trim();
@@ -27,19 +28,6 @@ if (supabaseUrl && supabaseKey) {
     console.log("   ↳ Appointments: Supabase connected");
 }
 
-// Email transporter
-let transporter = null;
-if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
-    transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD,
-        },
-    });
-    console.log("   ↳ Appointments: Email service ready");
-}
-
 let appointments = [];
 
 // Helper to get supabase instance
@@ -48,156 +36,91 @@ const getSupabase = (req) => {
 };
 
 // ============================================
-// EMAIL TEMPLATES
+// SEND EMAIL FUNCTION
 // ============================================
 const sendAppointmentEmail = async (appointment, type) => {
-    if (!transporter) {
-        console.log("⚠️ No email transporter");
+    if (!resend) {
+        console.log("⚠️ No Resend client");
         return { success: false };
     }
 
     const templates = {
         booked: {
             subject: "📅 Appointment Booked - P&A Institute",
+            icon: "📅",
+            color: "#f59e0b",
             title: "Appointment Booked!",
             message:
                 "Your appointment has been successfully booked and is pending confirmation.",
-            color: "#f59e0b",
-            icon: "📅",
         },
         confirmed: {
             subject: "✅ Appointment Confirmed - P&A Institute",
-            title: "Appointment Confirmed!",
-            message:
-                "Great news! Your appointment has been confirmed by our team.",
-            color: "#10b981",
             icon: "✅",
+            color: "#10b981",
+            title: "Appointment Confirmed!",
+            message: "Great news! Your appointment has been confirmed.",
         },
         cancelled: {
             subject: "❌ Appointment Cancelled - P&A Institute",
-            title: "Appointment Cancelled",
-            message:
-                "Your appointment has been cancelled. Please book a new appointment if needed.",
-            color: "#ef4444",
             icon: "❌",
+            color: "#ef4444",
+            title: "Appointment Cancelled",
+            message: "Your appointment has been cancelled.",
         },
         completed: {
             subject: "🎉 Appointment Completed - P&A Institute",
-            title: "Thank You!",
-            message:
-                "Your appointment has been marked as completed. We hope you had a great experience!",
-            color: "#3b82f6",
             icon: "🎉",
+            color: "#3b82f6",
+            title: "Thank You!",
+            message: "Your appointment has been completed.",
         },
     };
 
-    const template = templates[type] || templates["booked"];
+    const t = templates[type] || templates.booked;
 
     try {
-        const mailOptions = {
-            from: `"P&A Institute" <${process.env.EMAIL_USER}>`,
+        const { error } = await resend.emails.send({
+            from: FROM_EMAIL,
             to: appointment.email,
-            subject: template.subject,
+            subject: t.subject,
             html: `
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f5;">
+<body style="margin:0;padding:0;font-family:Arial,sans-serif;background:#f5f5f5;">
     <div style="max-width:600px;margin:0 auto;background:white;">
-        <div style="background:linear-gradient(135deg,#0d9488 0%,#14b8a6 100%);padding:40px 30px;text-align:center;">
-            <h1 style="color:white;margin:0;font-size:28px;">🏥 P&A Institute</h1>
-            <p style="color:rgba(255,255,255,0.9);margin:10px 0 0;">Appointment Update</p>
+        <div style="background:linear-gradient(135deg,#0d9488,#14b8a6);padding:40px 30px;text-align:center;">
+            <h1 style="color:white;margin:0;">🏥 P&A Institute</h1>
         </div>
-        <div style="padding:40px 30px;">
-            <div style="text-align:center;margin-bottom:30px;">
-                <span style="font-size:60px;">${template.icon}</span>
-                <h2 style="margin:15px 0 0;color:${template.color};">${template.title}</h2>
+        <div style="padding:40px 30px;text-align:center;">
+            <span style="font-size:60px;">${t.icon}</span>
+            <h2 style="color:${t.color};">${t.title}</h2>
+            <p>${t.message}</p>
+            <div style="background:#f8fafc;border-radius:12px;padding:25px;margin:20px 0;text-align:left;">
+                <p><strong>Patient:</strong> ${appointment.full_name || appointment.fullName}</p>
+                <p><strong>Service:</strong> ${appointment.service}</p>
+                <p><strong>Date:</strong> ${appointment.date}</p>
+                <p><strong>Time:</strong> ${appointment.time}</p>
+                <p><strong>Status:</strong> <span style="background:${t.color};color:white;padding:5px 15px;border-radius:20px;font-size:12px;">${type.toUpperCase()}</span></p>
             </div>
-            
-            <p style="font-size:16px;color:#333;text-align:center;margin-bottom:30px;">
-                ${template.message}
-            </p>
-            
-            <div style="background:#f8fafc;border-radius:12px;padding:25px;margin:20px 0;">
-                <h3 style="margin:0 0 20px;color:#333;border-bottom:2px solid ${template.color};padding-bottom:10px;">
-                    Appointment Details
-                </h3>
-                <table style="width:100%;border-collapse:collapse;">
-                    <tr>
-                        <td style="padding:10px 0;color:#666;width:40%;">Patient Name:</td>
-                        <td style="padding:10px 0;color:#333;font-weight:600;">${appointment.full_name || appointment.fullName}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:10px 0;color:#666;">Service:</td>
-                        <td style="padding:10px 0;color:#333;font-weight:600;">${appointment.service}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:10px 0;color:#666;">Date:</td>
-                        <td style="padding:10px 0;color:#333;font-weight:600;">${appointment.date}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:10px 0;color:#666;">Time:</td>
-                        <td style="padding:10px 0;color:#333;font-weight:600;">${appointment.time}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:10px 0;color:#666;">Status:</td>
-                        <td style="padding:10px 0;">
-                            <span style="background:${template.color};color:white;padding:5px 15px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;">
-                                ${type}
-                            </span>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            
-            ${
-                type === "confirmed"
-                    ? `
-            <div style="background:#f0fdfa;border-left:4px solid #14b8a6;padding:15px 20px;margin:20px 0;border-radius:0 8px 8px 0;">
-                <strong>📍 Reminder:</strong><br>
-                Please arrive 15 minutes before your scheduled time.<br>
-                Location: No 8 Animashaun Cl, Lagos
-            </div>
-            `
-                    : ""
-            }
-            
-            ${
-                type === "cancelled"
-                    ? `
-            <div style="text-align:center;margin:30px 0;">
-                <a href="https://my-pa-health.vercel.app" style="display:inline-block;background:#14b8a6;color:white;padding:14px 30px;text-decoration:none;border-radius:8px;font-weight:600;">
-                    Book New Appointment →
-                </a>
-            </div>
-            `
-                    : ""
-            }
-            
-            <p style="color:#666;margin-top:30px;font-size:14px;">
-                If you have any questions, please contact us at <a href="mailto:miniquehairs@gmail.com" style="color:#14b8a6;">miniquehairs@gmail.com</a>
-            </p>
         </div>
-        <div style="background:#1a1a2e;color:#888;padding:30px;text-align:center;font-size:14px;">
-            <p style="margin:0;"><strong>P&A Institute</strong> - Integrative Medicine</p>
-            <p style="margin:10px 0 0;">📞 +234 905 5066 381 | 📍 Lagos, Nigeria</p>
-            <p style="margin:10px 0 0;">© 2025 All rights reserved</p>
+        <div style="background:#1a1a2e;color:#888;padding:20px;text-align:center;font-size:14px;">
+            <p style="margin:0;">P&A Institute of Integrative Medicine</p>
+            <p style="margin:5px 0 0;">📞 +234 905 5066 381 | Lagos, Nigeria</p>
         </div>
     </div>
 </body>
-</html>
-            `,
-        };
+</html>`,
+        });
 
-        await transporter.sendMail(mailOptions);
+        if (error) {
+            console.log(`❌ Email error:`, error.message);
+            return { success: false };
+        }
         console.log(`📧 ${type} email sent to:`, appointment.email);
         return { success: true };
-    } catch (error) {
-        console.log(`⚠️ ${type} email failed:`, error.message);
-        return { success: false, error: error.message };
+    } catch (err) {
+        console.log(`❌ Email failed:`, err.message);
+        return { success: false };
     }
 };
 
@@ -216,14 +139,15 @@ router.post("/", async (req, res) => {
             time,
             message,
         } = req.body;
-
         const patientName = fullName || full_name;
 
         if (!patientName || !email || !service || !date || !time) {
-            return res.status(400).json({
-                success: false,
-                message: "Name, email, service, date and time are required",
-            });
+            return res
+                .status(400)
+                .json({
+                    success: false,
+                    message: "Name, email, service, date and time are required",
+                });
         }
 
         const appointmentData = {
@@ -250,29 +174,21 @@ router.post("/", async (req, res) => {
                 .from("appointments")
                 .insert([appointmentData]);
             if (error) {
-                console.error("DB error:", error.message);
-                // If it's a "table not found" or similar, we might want to know
+                console.error("❌ DB error:", error.message);
             } else {
-                console.log("✅ Saved to Supabase");
+                console.log("✅ Saved to Supabase:", appointmentData.id);
             }
-        } else {
-            console.log("⚠️ Supabase client not available for saving");
         }
         appointments.push(appointmentData);
 
         console.log("✅ Appointment created:", appointmentData.id);
 
-        // Send booking confirmation email
-        sendAppointmentEmail(appointmentData, "booked").then((result) => {
-            if (result.success) {
-                console.log("✅ Booking email sent to", appointmentData.email);
-            }
-        });
+        // Send email
+        sendAppointmentEmail(appointmentData, "booked");
 
         res.status(201).json({
             success: true,
-            message:
-                "Appointment booked successfully! Confirmation email sent.",
+            message: "Appointment booked successfully!",
             data: appointmentData,
         });
     } catch (error) {
@@ -287,26 +203,18 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
     try {
         let allAppointments = [];
+        const db = getSupabase(req);
 
-        if (supabase) {
-            const { data, error } = await supabase
+        if (db) {
+            const { data, error } = await db
                 .from("appointments")
                 .select("*")
                 .order("created_at", { ascending: false });
-
             if (data) allAppointments = data;
             if (error) console.error("DB error:", error.message);
         }
 
-        // Merge with in-memory
-        const merged = [...allAppointments];
-        appointments.forEach((apt) => {
-            if (!merged.find((a) => a.id === apt.id)) {
-                merged.push(apt);
-            }
-        });
-
-        res.json({ success: true, data: merged });
+        res.json({ success: true, data: allAppointments });
     } catch (error) {
         console.error("Get appointments error:", error);
         res.status(500).json({ success: false, message: error.message });
@@ -320,25 +228,17 @@ router.get("/user/:email", async (req, res) => {
     try {
         const email = req.params.email.toLowerCase().trim();
         let userAppointments = [];
+        const db = getSupabase(req);
 
-        if (supabase) {
-            const { data, error } = await supabase
+        if (db) {
+            const { data, error } = await db
                 .from("appointments")
                 .select("*")
                 .eq("email", email)
                 .order("created_at", { ascending: false });
-
             if (data) userAppointments = data;
             if (error) console.error("DB error:", error.message);
         }
-
-        // Also check in-memory
-        const inMemory = appointments.filter((a) => a.email === email);
-        inMemory.forEach((apt) => {
-            if (!userAppointments.find((a) => a.id === apt.id)) {
-                userAppointments.push(apt);
-            }
-        });
 
         res.json({ success: true, data: userAppointments });
     } catch (error) {
@@ -362,25 +262,17 @@ router.put("/:id", async (req, res) => {
         }
 
         let appointment = null;
+        const db = getSupabase(req);
 
-        // Update in Supabase
-        if (supabase) {
-            const { data, error } = await supabase
+        if (db) {
+            const { data, error } = await db
                 .from("appointments")
                 .update({ status, updated_at: new Date().toISOString() })
                 .eq("id", id)
                 .select()
                 .single();
-
             if (data) appointment = data;
             if (error) console.error("DB update error:", error.message);
-        }
-
-        // Also update in-memory
-        const memIndex = appointments.findIndex((a) => a.id === id);
-        if (memIndex !== -1) {
-            appointments[memIndex].status = status;
-            if (!appointment) appointment = appointments[memIndex];
         }
 
         if (!appointment) {
@@ -391,16 +283,12 @@ router.put("/:id", async (req, res) => {
 
         console.log(`✅ Appointment ${id} updated to: ${status}`);
 
-        // Send status update email
-        sendAppointmentEmail(appointment, status).then((result) => {
-            if (result.success) {
-                console.log(`✅ ${status} email sent to`, appointment.email);
-            }
-        });
+        // Send status email
+        sendAppointmentEmail(appointment, status);
 
         res.json({
             success: true,
-            message: `Appointment ${status}! Email notification sent.`,
+            message: `Appointment ${status}!`,
             data: appointment,
         });
     } catch (error) {
@@ -415,19 +303,17 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
     try {
         const { id } = req.params;
+        const db = getSupabase(req);
 
-        if (supabase) {
-            const { error } = await supabase
+        if (db) {
+            const { error } = await db
                 .from("appointments")
                 .delete()
                 .eq("id", id);
             if (error) console.error("DB delete error:", error.message);
         }
 
-        appointments = appointments.filter((a) => a.id !== id);
-
         console.log("✅ Appointment deleted:", id);
-
         res.json({ success: true, message: "Appointment deleted" });
     } catch (error) {
         console.error("Delete appointment error:", error);
