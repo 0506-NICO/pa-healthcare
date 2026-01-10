@@ -204,87 +204,18 @@ try {
     app.use('/api/appointments', require('./routes/appointments'));
     console.log('✅ Appointment routes loaded');
 } catch (e) {
-    console.log('⚠️  Using inline appointments');
-    
-    app.post('/api/appointments', async (req, res) => {
-        const { fullName, email, phone, service, date, time, amount, paymentRef } = req.body;
-        const id = 'APT_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-        const data = { 
-            id, full_name: fullName, email: email?.toLowerCase(), phone, service, date, time, 
-            amount: amount || 0, payment_reference: paymentRef || '', 
-            payment_status: paymentRef ? 'paid' : 'pending', status: 'pending', 
-            created_at: new Date().toISOString() 
-        };
-        if (supabase) await supabase.from('appointments').insert([data]);
-        
-        // Send confirmation email
-        if (emailService && email) {
-            try {
-                await emailService.sendAppointmentConfirmation({ to: email, name: fullName, service, date, time, appointmentId: id });
-            } catch (e) { console.log('Email failed'); }
-        }
-        
-        res.json({ success: true, data });
-    });
-    
-    app.get('/api/appointments', async (req, res) => {
-        const { email } = req.query;
-        if (supabase && email) {
-            const { data } = await supabase.from('appointments').select('*').eq('email', email.toLowerCase()).order('created_at', { ascending: false });
-            return res.json({ success: true, data: data || [] });
-        }
-        res.json({ success: true, data: [] });
-    });
-    
-    app.get('/api/appointments/:id', async (req, res) => {
-        if (supabase) {
-            const { data } = await supabase.from('appointments').select('*').eq('id', req.params.id).single();
-            return res.json({ success: true, data });
-        }
-        res.json({ success: false, message: 'Not found' });
-    });
-    
-    app.put('/api/appointments/:id', async (req, res) => {
-        if (supabase) {
-            const { data, error } = await supabase.from('appointments').update(req.body).eq('id', req.params.id).select().single();
-            
-            if (!error && data && req.body.status && emailService) {
-                try {
-                    await emailService.sendStatusUpdate(data.email, data);
-                    console.log('📧 Status email sent');
-                } catch (e) { console.log('Email failed'); }
-            }
-            
-            console.log('✅ Appointment updated:', req.params.id);
-            return res.json({ success: true, data });
-        }
-        res.json({ success: true });
-    });
-    
-    app.delete('/api/appointments/:id', async (req, res) => {
-        if (supabase) {
-            await supabase.from('appointments').delete().eq('id', req.params.id);
-        }
-        res.json({ success: true });
-    });
+    console.log('❌ Appointment routes error:', e.message);
 }
 
 // ============================================
 // PAYMENTS
 // ============================================
-app.post('/api/payments/initialize', (req, res) => {
-    res.json({ success: true, data: { reference: 'PAY_' + Date.now(), ...req.body } });
-});
-
-app.post('/api/payments/verify', async (req, res) => {
-    const { reference, appointmentId } = req.body;
-    if (supabase && appointmentId) {
-        await supabase.from('appointments').update({ 
-            payment_status: 'paid', status: 'confirmed', payment_reference: reference 
-        }).eq('id', appointmentId);
-    }
-    res.json({ success: true });
-});
+try {
+    app.use('/api/payments', require('./routes/payments'));
+    console.log('✅ Payment routes loaded');
+} catch (e) {
+    console.log('❌ Payment routes error:', e.message);
+}
 
 // ============================================
 // USER PROFILE

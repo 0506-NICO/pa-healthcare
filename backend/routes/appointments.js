@@ -42,6 +42,11 @@ if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
 
 let appointments = [];
 
+// Helper to get supabase instance
+const getSupabase = (req) => {
+    return req.app.locals.supabase || supabase;
+};
+
 // ============================================
 // EMAIL TEMPLATES
 // ============================================
@@ -239,13 +244,19 @@ router.post("/", async (req, res) => {
         };
 
         // Save to Supabase
-        if (supabase) {
-            const { error } = await supabase
+        const db = getSupabase(req);
+        if (db) {
+            const { error } = await db
                 .from("appointments")
                 .insert([appointmentData]);
             if (error) {
                 console.error("DB error:", error.message);
+                // If it's a "table not found" or similar, we might want to know
+            } else {
+                console.log("✅ Saved to Supabase");
             }
+        } else {
+            console.log("⚠️ Supabase client not available for saving");
         }
         appointments.push(appointmentData);
 
