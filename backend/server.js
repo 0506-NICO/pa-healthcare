@@ -9,10 +9,16 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// ============================================
+// SERVE FRONTEND (STATIC FILES)
+// ============================================
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // ============================================
 // JWT SECRET
